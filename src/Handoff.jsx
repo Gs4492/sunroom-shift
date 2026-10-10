@@ -44,6 +44,10 @@ function Handoff({
     editingHandoff?.note || ''
   )
 
+  const [createdBy, setCreatedBy] = useState(
+    editingHandoff?.createdBy || ''
+  )
+
   const [showDiscardConfirmation, setShowDiscardConfirmation] =
     useState(false)
 
@@ -69,7 +73,7 @@ function Handoff({
 
   const hasUnsavedChanges = editingHandoff
     ? note.trim() !== originalNote.trim() ||
-      category !== originalCategory
+    category !== originalCategory
     : note.trim().length > 0
 
   useEffect(() => {
@@ -108,14 +112,17 @@ function Handoff({
     onBack()
   }
 
+
   const handleSave = () => {
     if (!note.trim()) return
+    if (!createdBy.trim()) return
 
     if (isListening) stopListening()
 
     const savedHandoff = {
       id: editingHandoff?.id ?? Date.now(),
       category,
+      createdBy: createdBy.trim(),
       note: note.trim(),
       createdAt:
         editingHandoff?.createdAt || new Date().toISOString(),
@@ -123,6 +130,7 @@ function Handoff({
 
     onSave(savedHandoff)
   }
+
 
   return (
     <div className="handoff-screen">
@@ -204,6 +212,21 @@ function Handoff({
           />
         </section>
 
+        <section className="created-by-section">
+          <label htmlFor="handoff-created-by">Your name</label>
+
+          <input
+            id="handoff-created-by"
+            type="text"
+            value={createdBy}
+            onChange={(event) => setCreatedBy(event.target.value)}
+            placeholder="Enter your name"
+            autoComplete="name"
+            maxLength={60}
+            required
+          />
+        </section>
+
         <section className="category-section">
           <label>Category</label>
 
@@ -224,6 +247,7 @@ function Handoff({
             ))}
           </div>
         </section>
+
 
         <button
           type="button"

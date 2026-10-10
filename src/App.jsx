@@ -223,6 +223,7 @@ function App() {
       .insert({
         category: newHandoff.category,
         note: newHandoff.note,
+        created_by: newHandoff.createdBy,
       })
       .select()
       .single()
@@ -254,6 +255,7 @@ function App() {
       .update({
         category: updatedHandoff.category,
         note: updatedHandoff.note,
+        created_by: updatedHandoff.createdBy,
       })
       .eq('id', updatedHandoff.id)
       .select()
@@ -301,11 +303,13 @@ function App() {
     showSuccessMessage('Handoff deleted successfully!')
   }
 
-  const addTask = async (title) => {
+
+  const addTask = async (newTask) => {
     const { data, error } = await supabase
       .from('tasks')
       .insert({
-        title,
+        title: newTask.title,
+        created_by: newTask.createdBy,
         completed: false,
       })
       .select()
@@ -452,14 +456,39 @@ function App() {
               : `${handoffs.length} shift notes`}
           </h2>
 
+
           <div className="attention-list">
             {handoffs.slice(0, 2).map((handoff) => (
               <div className="attention-item" key={handoff.id}>
                 <span className="dot" aria-hidden="true" />
-                <span>{handoff.note}</span>
+
+                <div className="attention-content">
+                  <div className="attention-meta">
+                    <span className="attention-category">
+                      {handoff.category || "General"}
+                    </span>
+
+                    <span className="attention-time">
+                      {handoff.createdAt
+                        ? new Date(handoff.createdAt).toLocaleTimeString([], {
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })
+                        : ""}
+                    </span>
+                  </div>
+
+                  <span className="attention-note">{handoff.note}</span>
+                  {handoff.created_by && (
+                    <span className="attention-author">
+                      Added by {handoff.created_by}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
+
 
           <button
             className="text-button"

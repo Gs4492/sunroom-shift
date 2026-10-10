@@ -2,10 +2,27 @@
 
 :root {
   font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #25282d;
+  background: #f3f4f6;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --app-bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface-muted: #f7f7f8;
+  --ink: #25282d;
+  --ink-soft: #515760;
+  --muted: #777d86;
+  --line: #e2e4e8;
+  --accent: #e97822;
+  --accent-hover: #cc6113;
+  --accent-soft: #fff0e4;
+  --success: #347454;
+  --danger: #b42318;
+  --radius-card: 18px;
+  --radius-control: 12px;
 }
 
 * {
@@ -14,14 +31,19 @@
 
 html {
   min-width: 320px;
-  background: #f7f3ff;
+  min-height: 100%;
+  background: var(--app-bg);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--app-bg);
+  color: var(--ink);
 }
 
 button,
@@ -34,6 +56,34 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(233, 120, 34, 0.28);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+::selection {
+  background: #ffe0c7;
+  color: #25282d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

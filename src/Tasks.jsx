@@ -28,15 +28,23 @@ function Icon({ name, size = 20 }) {
 
 function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
   const [newTask, setNewTask] = useState('')
+  const [createdBy, setCreatedBy] = useState('')
+
 
   const handleAddTask = () => {
-    if (!newTask.trim()) {
+    if (!newTask.trim() || !createdBy.trim()) {
       return
     }
 
-    onAddTask(newTask.trim())
+    onAddTask({
+      title: newTask.trim(),
+      createdBy: createdBy.trim(),
+    })
+
     setNewTask('')
+    setCreatedBy('')
   }
+
 
   const openTasks = tasks.filter(
     (task) => !task.completed
@@ -90,6 +98,17 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
             aria-label="New task"
           />
 
+
+          <input
+            type="text"
+            value={createdBy}
+            onChange={(event) => setCreatedBy(event.target.value)}
+            placeholder="Your name"
+            aria-label="Your name"
+            maxLength={60}
+          />
+
+
           <button
             type="button"
             onClick={handleAddTask}
@@ -126,9 +145,16 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
                 >
                   <span className="task-checkbox" />
 
-                  <span className="task-title">
-                    {task.title}
+
+                  <span className="task-details">
+                    <span className="task-title">{task.title}</span>
+                    {task.created_by && (
+                      <span className="task-author">
+                        Added by {task.created_by}
+                      </span>
+                    )}
                   </span>
+
                 </button>
               ))
             )}

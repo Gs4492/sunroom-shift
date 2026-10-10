@@ -92,8 +92,8 @@ function HandoffHistory({
     selectedCategory === 'All'
       ? handoffs
       : handoffs.filter(
-          (handoff) => handoff.category === selectedCategory
-        )
+        (handoff) => handoff.category === selectedCategory
+      )
 
   const confirmDelete = () => {
     if (!handoffToDelete) {
@@ -191,6 +191,14 @@ function HandoffHistory({
                 </div>
 
                 <p>{handoff.note}</p>
+
+
+                {handoff.created_by && (
+                  <div className="history-author">
+                    Added by {handoff.created_by}
+                  </div>
+                )}
+
 
                 <div className="handoff-card-actions">
                   <button
