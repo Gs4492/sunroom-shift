@@ -190,6 +190,15 @@
 
 }
 
+.welcome-logo {
+  display: block;
+  width: 150px;
+  max-width: 60%;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto 20px;
+}
+
 
 
 .welcome p:last-child {
@@ -3208,15 +3217,13 @@ button:disabled {
   border: 2px solid transparent !important;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
-    linear-gradient(
-      110deg,
+    linear-gradient(110deg,
       #f59e0b,
       #fb7185,
       #8b5cf6,
       #3b82f6,
       #34d399,
-      #f59e0b
-    ) border-box !important;
+      #f59e0b) border-box !important;
   background-size: 100% 100%, 300% 300%;
   animation: handoff-border-flow 8s linear infinite;
 }

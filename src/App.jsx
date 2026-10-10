@@ -5,6 +5,7 @@ import Handoff from './Handoff'
 import HandoffHistory from './HandoffHistory'
 import Tasks from './Tasks'
 import { supabase } from './supabaseClient'
+import sunroomLogo from './assets/sunroom-plants-logo.png'
 
 function Icon({ name, size = 20, strokeWidth = 1.8 }) {
   const common = {
@@ -426,6 +427,11 @@ function App() {
     return (
       <main className="main-content">
         <section className="welcome">
+          <img
+            src={sunroomLogo}
+            alt="Sunroom Plants"
+            className="welcome-logo"
+          />
           <p className="eyebrow">{formattedDate.toUpperCase()}</p>
           <h1>Welcome to Sunroom Shift</h1>
           <p>Review shift handoffs and track shop tasks.</p>
