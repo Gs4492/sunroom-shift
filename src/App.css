@@ -1,0 +1,3296 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+.app {
+
+  min-height: 100vh;
+
+  background: #f7f3ff;
+
+  color: #292438;
+
+  padding-bottom: 82px;
+
+}
+
+
+
+/* ---------- Top Bar ---------- */
+
+
+
+.top-bar {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 22px 24px;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #eee9f7;
+
+}
+
+
+
+.brand {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+}
+
+
+
+.brand-icon {
+
+  width: 40px;
+
+  height: 40px;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 13px;
+
+  background: #a879df;
+
+  color: #ffffff;
+
+  font-size: 20px;
+
+  box-shadow: 0 6px 14px rgba(168, 121, 223, 0.22);
+
+}
+
+
+
+.brand span,
+
+.brand strong {
+
+  display: block;
+
+  line-height: 1.1;
+
+}
+
+
+
+.brand span {
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  color: #8c8298;
+
+  letter-spacing: 0.2px;
+
+}
+
+
+
+.brand strong {
+
+  font-size: 19px;
+
+  font-weight: 700;
+
+  letter-spacing: -0.4px;
+
+  color: #30263d;
+
+}
+
+
+
+.menu-button {
+
+  width: 38px;
+
+  height: 38px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #f7f3ff;
+
+  color: #81778d;
+
+  font-size: 22px;
+
+  cursor: pointer;
+
+}
+
+
+
+/* ---------- Main ---------- */
+
+
+
+.main-content {
+
+  width: min(680px, calc(100% - 32px));
+
+  margin: 0 auto;
+
+  padding: 38px 0 30px;
+
+}
+
+
+
+.welcome {
+
+  margin-bottom: 28px;
+
+}
+
+
+
+.eyebrow {
+
+  margin: 0 0 8px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 1.5px;
+
+  color: #988aa7;
+
+}
+
+
+
+.welcome h1 {
+
+  margin: 0 0 9px;
+
+  font-size: 31px;
+
+  line-height: 1.15;
+
+  font-weight: 700;
+
+  letter-spacing: -1px;
+
+  color: #30263e;
+
+}
+
+
+
+.welcome p:last-child {
+
+  margin: 0;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+
+  font-weight: 400;
+
+  color: #81778d;
+
+}
+
+
+
+/* ---------- Handoff Card ---------- */
+
+
+
+.handoff-card {
+
+  padding: 25px;
+
+  border-radius: 24px;
+
+  background: linear-gradient(145deg, #a878e1, #bd91ed);
+
+  color: #ffffff;
+
+  box-shadow: 0 14px 30px rgba(150, 105, 208, 0.2);
+
+}
+
+
+
+.card-top {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+}
+
+
+
+.card-icon {
+
+  width: 38px;
+
+  height: 38px;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.2);
+
+  font-size: 17px;
+
+}
+
+
+
+.card-label {
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 1.4px;
+
+  opacity: 0.88;
+
+}
+
+
+
+.handoff-card h2 {
+
+  margin: 20px 0 18px;
+
+  color: #ffffff;
+
+  font-size: 22px;
+
+  line-height: 1.25;
+
+  font-weight: 700;
+
+  letter-spacing: -0.5px;
+
+}
+
+
+
+.attention-list {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+}
+
+
+
+.attention-item {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 11px 13px;
+
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.16);
+
+  font-size: 13px;
+
+  line-height: 1.4;
+
+  font-weight: 500;
+
+}
+
+
+
+.dot {
+
+  width: 8px;
+
+  height: 8px;
+
+  flex: 0 0 8px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+}
+
+
+
+.dot.red {
+
+  background: #ff8f9f;
+
+}
+
+
+
+.dot.purple {
+
+  background: #e7ccff;
+
+}
+
+
+
+.text-button {
+
+  margin-top: 18px;
+
+  padding: 0;
+
+  border: none;
+
+  background: none;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+}
+
+
+
+/* ---------- Quick Actions ---------- */
+
+
+
+.quick-actions {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 13px;
+
+  margin-top: 16px;
+
+}
+
+
+
+.quick-card {
+
+  min-height: 135px;
+
+  padding: 18px;
+
+  border: 1px solid #eee8f7;
+
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  text-align: left;
+
+  box-shadow: 0 5px 18px rgba(80, 57, 105, 0.045);
+
+  cursor: pointer;
+
+  transition:
+
+    transform 0.2s ease,
+
+    box-shadow 0.2s ease;
+
+}
+
+
+
+.quick-card:hover {
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 9px 22px rgba(80, 57, 105, 0.08);
+
+}
+
+
+
+.quick-icon {
+
+  display: block;
+
+  margin-bottom: 14px;
+
+  font-size: 22px;
+
+}
+
+
+
+.quick-card strong,
+
+.quick-card small {
+
+  display: block;
+
+}
+
+
+
+.quick-card strong {
+
+  color: #382e46;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  letter-spacing: -0.15px;
+
+}
+
+
+
+.quick-card small {
+
+  margin-top: 5px;
+
+  color: #978da2;
+
+  font-size: 11px;
+
+  font-weight: 500;
+
+}
+
+
+
+/* ---------- Add Handoff ---------- */
+
+
+
+.add-handoff {
+
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-top: 18px;
+
+  padding: 17px 18px;
+
+  border: none;
+
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  color: #352b40;
+
+  text-align: left;
+
+  box-shadow: 0 7px 22px rgba(80, 57, 105, 0.06);
+
+  cursor: pointer;
+
+  transition:
+
+    transform 0.2s ease,
+
+    box-shadow 0.2s ease;
+
+}
+
+
+
+.add-handoff:hover {
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 10px 25px rgba(80, 57, 105, 0.09);
+
+}
+
+
+
+.add-handoff>span:first-child {
+
+  width: 45px;
+
+  height: 45px;
+
+  display: grid;
+
+  place-items: center;
+
+  flex: 0 0 45px;
+
+  border-radius: 14px;
+
+  background: #eee3ff;
+
+  font-size: 19px;
+
+}
+
+
+
+.add-handoff strong,
+
+.add-handoff small {
+
+  display: block;
+
+}
+
+
+
+.add-handoff strong {
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  letter-spacing: -0.15px;
+
+}
+
+
+
+.add-handoff small {
+
+  margin-top: 4px;
+
+  color: #978da2;
+
+  font-size: 11px;
+
+  font-weight: 500;
+
+}
+
+
+
+.add-handoff .arrow {
+
+  margin-left: auto;
+
+  color: #a879df;
+
+  font-size: 20px;
+
+}
+
+
+
+/* ---------- Bottom Navigation ---------- */
+
+
+
+.bottom-nav {
+
+  position: fixed;
+
+  right: 0;
+
+  bottom: 0;
+
+  left: 0;
+
+  z-index: 10;
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 50px;
+
+  padding: 10px 20px 12px;
+
+  background: rgba(255, 255, 255, 0.96);
+
+  border-top: 1px solid #eee8f7;
+
+  backdrop-filter: blur(12px);
+
+}
+
+
+
+.nav-item {
+
+  min-width: 55px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 3px;
+
+  border: none;
+
+  background: none;
+
+  color: #a097aa;
+
+  font-size: 10px;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+}
+
+
+
+.nav-item span {
+
+  font-size: 18px;
+
+}
+
+
+
+.nav-item.active {
+
+  color: #9a6fd0;
+
+  font-weight: 700;
+
+}
+
+
+
+/* ---------- Responsive ---------- */
+
+
+
+@media (max-width: 600px) {
+
+  .top-bar {
+
+    padding: 18px 16px;
+
+  }
+
+
+
+  .brand strong {
+
+    font-size: 18px;
+
+  }
+
+
+
+  .main-content {
+
+    width: calc(100% - 24px);
+
+    padding-top: 30px;
+
+  }
+
+
+
+  .welcome h1 {
+
+    font-size: 27px;
+
+    letter-spacing: -0.8px;
+
+  }
+
+
+
+  .handoff-card {
+
+    padding: 21px;
+
+    border-radius: 21px;
+
+  }
+
+
+
+  .handoff-card h2 {
+
+    font-size: 21px;
+
+  }
+
+
+
+  .quick-card {
+
+    min-height: 125px;
+
+    padding: 16px;
+
+  }
+
+
+
+  .bottom-nav {
+
+    gap: 42px;
+
+  }
+
+}
+
+
+
+/* ---------- Handoff Screen ---------- */
+
+
+
+.handoff-screen {
+
+  min-height: 100vh;
+
+  background: #f7f3ff;
+
+  color: #292438;
+
+  padding-bottom: 30px;
+
+}
+
+
+
+.screen-header {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 20px 24px;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #eee9f7;
+
+}
+
+
+
+.back-button {
+
+  width: 40px;
+
+  height: 40px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #f7f3ff;
+
+  color: #6f647c;
+
+  font-size: 21px;
+
+  cursor: pointer;
+
+}
+
+
+
+.screen-eyebrow {
+
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #988aa7;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 1.4px;
+
+}
+
+
+
+.screen-header h1 {
+
+  margin: 0;
+
+  color: #30263e;
+
+  font-size: 20px;
+
+  font-weight: 700;
+
+  letter-spacing: -0.4px;
+
+}
+
+
+
+/* ---------- Handoff Content ---------- */
+
+
+
+.handoff-content {
+
+  width: min(680px, calc(100% - 32px));
+
+  margin: 0 auto;
+
+  padding: 35px 0 40px;
+
+}
+
+
+
+.handoff-intro {
+
+  text-align: center;
+
+  margin-bottom: 32px;
+
+}
+
+
+
+.large-mic-icon {
+
+  width: 68px;
+
+  height: 68px;
+
+  display: grid;
+
+  place-items: center;
+
+  margin: 0 auto 18px;
+
+  border-radius: 22px;
+
+  background: #eee3ff;
+
+  font-size: 29px;
+
+  box-shadow: 0 8px 20px rgba(150, 105, 208, 0.08);
+
+}
+
+
+
+.handoff-intro h2 {
+
+  margin: 0 0 9px;
+
+  color: #30263e;
+
+  font-size: 23px;
+
+  line-height: 1.25;
+
+  font-weight: 700;
+
+  letter-spacing: -0.6px;
+
+}
+
+
+
+.handoff-intro p {
+
+  max-width: 400px;
+
+  margin: 0 auto;
+
+  color: #81778d;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+}
+
+
+
+/* ---------- Note ---------- */
+
+
+
+.note-section,
+
+.category-section {
+
+  margin-bottom: 24px;
+
+}
+
+
+
+.note-section label,
+
+.category-section label {
+
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #40364c;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+}
+
+
+
+.note-section textarea {
+
+  width: 100%;
+
+  min-height: 155px;
+
+  resize: vertical;
+
+  padding: 16px;
+
+  border: 1px solid #e8e1f1;
+
+  border-radius: 18px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #352b40;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+  box-shadow: 0 6px 20px rgba(80, 57, 105, 0.04);
+
+  transition:
+
+    border-color 0.2s ease,
+
+    box-shadow 0.2s ease;
+
+}
+
+
+
+.note-section textarea::placeholder {
+
+  color: #aaa1b3;
+
+}
+
+
+
+.note-section textarea:focus {
+
+  border-color: #b68ae7;
+
+  box-shadow: 0 0 0 4px rgba(182, 138, 231, 0.12);
+
+}
+
+
+
+/* ---------- Categories ---------- */
+
+
+
+.category-list {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 9px;
+
+}
+
+
+
+.category-button {
+
+  padding: 10px 14px;
+
+  border: 1px solid #e5ddef;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  color: #786d83;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+
+    background 0.2s ease,
+
+    border-color 0.2s ease,
+
+    color 0.2s ease;
+
+}
+
+
+
+.category-button:hover {
+
+  border-color: #cdb2ea;
+
+}
+
+
+
+.category-button.selected {
+
+  border-color: #a879df;
+
+  background: #a879df;
+
+  color: #ffffff;
+
+}
+
+
+
+/* ---------- Save Button ---------- */
+
+
+
+.save-handoff {
+
+  width: 100%;
+
+  margin-top: 10px;
+
+  padding: 16px;
+
+  border: none;
+
+  border-radius: 17px;
+
+  background: #a879df;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 9px 20px rgba(150, 105, 208, 0.2);
+
+  transition:
+
+    transform 0.2s ease,
+
+    opacity 0.2s ease,
+
+    box-shadow 0.2s ease;
+
+}
+
+
+
+.save-handoff:hover:not(:disabled) {
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 12px 24px rgba(150, 105, 208, 0.25);
+
+}
+
+
+
+.save-handoff:disabled {
+
+  opacity: 0.45;
+
+  cursor: not-allowed;
+
+  box-shadow: none;
+
+}
+
+
+
+/* ---------- Mobile ---------- */
+
+
+
+@media (max-width: 600px) {
+
+  .screen-header {
+
+    padding: 18px 16px;
+
+  }
+
+
+
+  .handoff-content {
+
+    width: calc(100% - 24px);
+
+    padding-top: 30px;
+
+  }
+
+
+
+  .handoff-intro h2 {
+
+    font-size: 21px;
+
+  }
+
+
+
+  .note-section textarea {
+
+    min-height: 145px;
+
+  }
+
+}
+
+
+
+/* ---------- Handoff History ---------- */
+
+
+
+.handoff-history-screen {
+
+  min-height: 100vh;
+
+  background: #f7f3ff;
+
+  color: #292438;
+
+  padding-bottom: 30px;
+
+}
+
+
+
+.history-content {
+
+  width: min(680px, calc(100% - 32px));
+
+  margin: 0 auto;
+
+  padding: 34px 0 40px;
+
+}
+
+
+
+.history-intro {
+
+  margin-bottom: 22px;
+
+}
+
+
+
+.history-intro h2 {
+
+  margin: 0 0 7px;
+
+  color: #30263e;
+
+  font-size: 23px;
+
+  font-weight: 700;
+
+  letter-spacing: -0.6px;
+
+}
+
+
+
+.history-intro p {
+
+  margin: 0;
+
+  color: #81778d;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+}
+
+
+
+/* ---------- History Cards ---------- */
+
+
+
+.history-list {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+
+}
+
+
+
+.history-card {
+
+  padding: 18px;
+
+  border: 1px solid #eee8f7;
+
+  border-radius: 19px;
+
+  background: #ffffff;
+
+  box-shadow: 0 6px 20px rgba(80, 57, 105, 0.05);
+
+}
+
+
+
+.history-card-top {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 11px;
+
+}
+
+
+
+.history-category {
+
+  padding: 6px 9px;
+
+  border-radius: 9px;
+
+  background: #eee3ff;
+
+  color: #8256ae;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.4px;
+
+  text-transform: uppercase;
+
+}
+
+
+
+.history-time {
+
+  color: #aaa1b3;
+
+  font-size: 10px;
+
+  font-weight: 500;
+
+}
+
+
+
+.history-card p {
+
+  margin: 0;
+
+  color: #40364c;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+}
+
+
+
+/* ---------- Empty History ---------- */
+
+
+
+.empty-history {
+
+  padding: 45px 24px;
+
+  border: 1px dashed #ddd2eb;
+
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.65);
+
+  text-align: center;
+
+}
+
+
+
+.empty-icon {
+
+  width: 54px;
+
+  height: 54px;
+
+  display: grid;
+
+  place-items: center;
+
+  margin: 0 auto 14px;
+
+  border-radius: 17px;
+
+  background: #eee3ff;
+
+  font-size: 23px;
+
+}
+
+
+
+.empty-history h3 {
+
+  margin: 0 0 7px;
+
+  color: #40364c;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+}
+
+
+
+.empty-history p {
+
+  max-width: 280px;
+
+  margin: 0 auto;
+
+  color: #978da2;
+
+  font-size: 12px;
+
+  line-height: 1.6;
+
+}
+
+
+
+/* ---------- History Mobile ---------- */
+
+
+
+@media (max-width: 600px) {
+
+  .history-content {
+
+    width: calc(100% - 24px);
+
+    padding-top: 30px;
+
+  }
+
+
+
+  .history-intro h2 {
+
+    font-size: 21px;
+
+  }
+
+
+
+  .history-card {
+
+    padding: 16px;
+
+  }
+
+}
+
+
+
+/* ---------- Tasks Screen ---------- */
+
+
+
+.tasks-screen {
+
+  min-height: 100vh;
+
+  background: #f7f3ff;
+
+  color: #292438;
+
+  padding-bottom: 30px;
+
+}
+
+
+
+.tasks-content {
+
+  width: min(680px, calc(100% - 32px));
+
+  margin: 0 auto;
+
+  padding: 34px 0 40px;
+
+}
+
+
+
+.tasks-intro {
+
+  margin-bottom: 22px;
+
+}
+
+
+
+.tasks-intro h2 {
+
+  margin: 0 0 7px;
+
+  color: #30263e;
+
+  font-size: 23px;
+
+  font-weight: 700;
+
+  letter-spacing: -0.6px;
+
+}
+
+
+
+.tasks-intro p {
+
+  margin: 0;
+
+  color: #81778d;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+}
+
+
+
+/* ---------- Add Task ---------- */
+
+
+
+.add-task-section {
+
+  display: flex;
+
+  gap: 9px;
+
+  margin-bottom: 30px;
+
+}
+
+
+
+.add-task-section input {
+
+  min-width: 0;
+
+  flex: 1;
+
+  padding: 14px 15px;
+
+  border: 1px solid #e5ddef;
+
+  border-radius: 15px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #352b40;
+
+  font-size: 13px;
+
+  box-shadow: 0 5px 18px rgba(80, 57, 105, 0.04);
+
+}
+
+
+
+.add-task-section input::placeholder {
+
+  color: #aaa1b3;
+
+}
+
+
+
+.add-task-section input:focus {
+
+  border-color: #b68ae7;
+
+  box-shadow: 0 0 0 4px rgba(182, 138, 231, 0.12);
+
+}
+
+
+
+.add-task-section button {
+
+  padding: 0 18px;
+
+  border: none;
+
+  border-radius: 15px;
+
+  background: #a879df;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 7px 17px rgba(150, 105, 208, 0.18);
+
+}
+
+
+
+.add-task-section button:disabled {
+
+  opacity: 0.45;
+
+  cursor: not-allowed;
+
+  box-shadow: none;
+
+}
+
+
+
+/* ---------- Task Sections ---------- */
+
+
+
+.task-section {
+
+  margin-bottom: 28px;
+
+}
+
+
+
+.task-section-heading {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 11px;
+
+}
+
+
+
+.task-section-heading h3 {
+
+  margin: 0;
+
+  color: #40364c;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.1px;
+
+}
+
+
+
+.task-section-heading span {
+
+  min-width: 23px;
+
+  height: 23px;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 8px;
+
+  background: #eee3ff;
+
+  color: #8256ae;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+}
+
+
+
+.task-list {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 9px;
+
+}
+
+
+
+.task-card {
+
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 15px;
+
+  border: 1px solid #eee8f7;
+
+  border-radius: 17px;
+
+  background: #ffffff;
+
+  color: #40364c;
+
+  text-align: left;
+
+  box-shadow: 0 5px 18px rgba(80, 57, 105, 0.045);
+
+  cursor: pointer;
+
+  transition:
+
+    transform 0.2s ease,
+
+    box-shadow 0.2s ease;
+
+}
+
+
+
+.task-card:hover {
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 8px 21px rgba(80, 57, 105, 0.07);
+
+}
+
+
+
+.task-checkbox {
+
+  width: 22px;
+
+  height: 22px;
+
+  flex: 0 0 22px;
+
+  display: grid;
+
+  place-items: center;
+
+  border: 2px solid #d8cbe4;
+
+  border-radius: 7px;
+
+  color: #ffffff;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+}
+
+
+
+.task-checkbox.checked {
+
+  border-color: #a879df;
+
+  background: #a879df;
+
+}
+
+
+
+.task-title {
+
+  font-size: 13px;
+
+  line-height: 1.45;
+
+  font-weight: 600;
+
+}
+
+
+
+.task-card.completed {
+
+  opacity: 0.58;
+
+}
+
+
+
+.task-card.completed .task-title {
+
+  text-decoration: line-through;
+
+  color: #81778d;
+
+}
+
+
+
+/* ---------- Empty Tasks ---------- */
+
+
+
+.empty-tasks {
+
+  padding: 35px 20px;
+
+  border: 1px dashed #ddd2eb;
+
+  border-radius: 19px;
+
+  background: rgba(255, 255, 255, 0.65);
+
+  text-align: center;
+
+}
+
+
+
+.empty-task-icon {
+
+  width: 50px;
+
+  height: 50px;
+
+  display: grid;
+
+  place-items: center;
+
+  margin: 0 auto 12px;
+
+  border-radius: 16px;
+
+  background: #eee3ff;
+
+  color: #8c68ae;
+
+  font-size: 19px;
+
+  font-weight: 700;
+
+}
+
+
+
+.empty-tasks p {
+
+  margin: 0;
+
+  color: #978da2;
+
+  font-size: 12px;
+
+}
+
+
+
+/* ---------- Completed ---------- */
+
+
+
+.completed-section {
+
+  opacity: 0.95;
+
+}
+
+
+
+/* ---------- Tasks Mobile ---------- */
+
+
+
+@media (max-width: 600px) {
+
+  .tasks-content {
+
+    width: calc(100% - 24px);
+
+    padding-top: 30px;
+
+  }
+
+
+
+  .tasks-intro h2 {
+
+    font-size: 21px;
+
+  }
+
+
+
+  .add-task-section input {
+
+    padding: 13px;
+
+  }
+
+
+
+  .add-task-section button {
+
+    padding: 0 16px;
+
+  }
+
+}
+
+
+
+/* ---------- Voice Recording ---------- */
+
+
+
+.large-mic-icon {
+
+  border: none;
+
+  cursor: pointer;
+
+  transition:
+
+    transform 0.2s ease,
+
+    box-shadow 0.2s ease,
+
+    background 0.2s ease;
+
+}
+
+
+
+.large-mic-icon:hover {
+
+  transform: translateY(-2px);
+
+}
+
+
+
+.large-mic-icon.listening {
+
+  background: #d9b9f7;
+
+  box-shadow:
+
+    0 0 0 8px rgba(168, 121, 223, 0.12),
+
+    0 0 0 16px rgba(168, 121, 223, 0.06);
+
+  animation: microphone-pulse 1.5s ease-in-out infinite;
+
+}
+
+
+
+.speech-error {
+
+  max-width: 360px;
+
+  margin: 12px auto 0 !important;
+
+  padding: 9px 12px;
+
+  border-radius: 10px;
+
+  background: #fff0f2;
+
+  color: #b65c6b !important;
+
+  font-size: 11px !important;
+
+}
+
+
+
+@keyframes microphone-pulse {
+
+  0%,
+
+  100% {
+
+    transform: scale(1);
+
+  }
+
+
+
+  50% {
+
+    transform: scale(1.05);
+
+  }
+
+}
+
+
+
+/* ---------- Handoff History Filters ---------- */
+
+
+
+.history-filters {
+
+  display: flex;
+
+  gap: 8px;
+
+  margin-bottom: 20px;
+
+  overflow-x: auto;
+
+  padding-bottom: 3px;
+
+  scrollbar-width: none;
+
+}
+
+
+
+.history-filters::-webkit-scrollbar {
+
+  display: none;
+
+}
+
+
+
+.history-filter {
+
+  flex: 0 0 auto;
+
+  padding: 9px 13px;
+
+  border: 1px solid #e5ddef;
+
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  color: #786d83;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+
+    background 0.2s ease,
+
+    border-color 0.2s ease,
+
+    color 0.2s ease;
+
+}
+
+
+
+.history-filter:hover {
+
+  border-color: #cdb2ea;
+
+}
+
+
+
+.history-filter.selected {
+
+  border-color: #a879df;
+
+  background: #a879df;
+
+  color: #ffffff;
+
+}
+
+
+
+
+
+.discard-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(30, 24, 45, 0.48);
+
+}
+
+
+
+.discard-dialog {
+
+  width: 100%;
+
+  max-width: 360px;
+
+  padding: 24px;
+
+  background: #ffffff;
+
+  border-radius: 20px;
+
+  box-shadow: 0 16px 48px rgba(30, 24, 45, 0.2);
+
+}
+
+
+
+.discard-dialog h2 {
+
+  margin: 0 0 10px;
+
+  color: #292238;
+
+  font-size: 20px;
+
+}
+
+
+
+.discard-dialog p {
+
+  margin: 0 0 24px;
+
+  color: #716b7d;
+
+  line-height: 1.6;
+
+}
+
+
+
+.discard-actions {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+}
+
+
+
+.discard-actions button {
+
+  width: 100%;
+
+  min-height: 44px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  font-weight: 700;
+
+}
+
+
+
+.keep-editing-button {
+
+  background: #eee7ff;
+
+  color: #6041a5;
+
+}
+
+
+
+.discard-button {
+
+  background: #fff0f0;
+
+  color: #b42318;
+
+}
+
+
+
+
+
+/* ---------- Home Task Progress ---------- */
+
+
+
+.task-progress-card {
+
+  margin-top: 16px;
+
+  padding: 22px;
+
+  border: 1px solid #eee8f7;
+
+  border-radius: 22px;
+
+  background: #ffffff;
+
+  box-shadow: 0 6px 20px rgba(80, 57, 105, 0.05);
+
+}
+
+
+
+.task-progress-heading {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 18px;
+
+}
+
+
+
+.task-progress-eyebrow {
+
+  color: #988aa7;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 1.2px;
+
+}
+
+
+
+.task-progress-heading h2 {
+
+  margin: 6px 0 0;
+
+  color: #30263e;
+
+  font-size: 19px;
+
+  font-weight: 700;
+
+}
+
+
+
+.task-progress-percent {
+
+  color: #8f60c3;
+
+  font-size: 25px;
+
+  font-weight: 800;
+
+}
+
+
+
+.task-progress-track {
+
+  height: 9px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: #eee7f7;
+
+}
+
+
+
+.task-progress-fill {
+
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: linear-gradient(90deg, #a879df, #c19ae9);
+
+  transition: width 0.3s ease;
+
+}
+
+
+
+.task-progress-summary {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-top: 13px;
+
+  color: #81778d;
+
+  font-size: 11px;
+
+}
+
+
+
+.task-progress-summary strong {
+
+  color: #40364c;
+
+  font-weight: 700;
+
+}
+
+
+
+.task-progress-link {
+
+  margin-top: 18px;
+
+  padding: 0;
+
+  border: none;
+
+  background: none;
+
+  color: #8f60c3;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+}
+
+
+
+
+
+/* ---------- Delete Handoff ---------- */
+
+
+
+.delete-handoff-button {
+
+  margin-top: 14px;
+
+  padding: 8px 11px;
+
+  border: 1px solid #f1d9dc;
+
+  border-radius: 10px;
+
+  background: #fff7f7;
+
+  color: #b42318;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+}
+
+
+
+.delete-handoff-button:hover {
+
+  background: #ffeded;
+
+}
+
+
+
+
+
+/* ---------- Handoff Card Actions ---------- */
+
+
+
+.handoff-card-actions {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 16px;
+
+  flex-wrap: wrap;
+
+}
+
+
+
+.handoff-card-actions button {
+
+  min-height: 38px;
+
+  padding: 9px 14px;
+
+  border-radius: 10px;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+
+    background 0.2s ease,
+
+    border-color 0.2s ease,
+
+    transform 0.2s ease;
+
+}
+
+
+
+.edit-handoff-button {
+
+  border: 1px solid #e2d5fa;
+
+  background: #f4efff;
+
+  color: #7045b5;
+
+}
+
+
+
+.edit-handoff-button:hover {
+
+  border-color: #cbb4f0;
+
+  background: #eae0ff;
+
+}
+
+
+
+.delete-handoff-button {
+
+  margin-top: 0;
+
+  border: 1px solid #f1d9dc;
+
+  background: #fff7f7;
+
+  color: #b42318;
+
+}
+
+
+
+.delete-handoff-button:hover {
+
+  border-color: #eebfc4;
+
+  background: #ffeded;
+
+}
+
+
+
+.handoff-card-actions button:active {
+
+  transform: scale(0.97);
+
+}
+
+
+
+.handoff-card-actions button:focus-visible {
+
+  outline: 3px solid #cbb4f0;
+
+  outline-offset: 2px;
+
+}
+
+
+
+
+
+/* ---------- Save Confirmation Toast ---------- */
+
+
+
+.save-toast {
+
+  position: fixed;
+
+  top: 20px;
+
+  left: 50%;
+
+  z-index: 2000;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  width: max-content;
+
+  max-width: calc(100% - 32px);
+
+  padding: 14px 18px;
+
+  border: 1px solid #ccebd9;
+
+  border-radius: 14px;
+
+  background: #f0fff6;
+
+  color: #176b43;
+
+  box-shadow: 0 8px 28px rgba(32, 80, 54, 0.14);
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  transform: translateX(-50%);
+
+  animation: toast-appear 0.25s ease-out;
+
+}
+
+
+
+.save-toast-icon {
+
+  display: grid;
+
+  flex-shrink: 0;
+
+  width: 24px;
+
+  height: 24px;
+
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #d5f5e2;
+
+  color: #176b43;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+}
+
+
+
+@keyframes toast-appear {
+
+  from {
+
+    opacity: 0;
+
+    transform: translate(-50%, -10px);
+
+  }
+
+
+
+  to {
+
+    opacity: 1;
+
+    transform: translate(-50%, 0);
+
+  }
+
+}
+
+
+
+@media (max-width: 480px) {
+
+  .save-toast {
+
+    top: 14px;
+
+    padding: 12px 14px;
+
+    font-size: 12px;
+
+  }
+
+}
+
+
+/* =========================================================
+   SUNROOM SHIFT — OPERATIONS-FIRST VISUAL SYSTEM
+   White / graphite / amber. Existing component selectors
+   are intentionally preserved so functionality is unchanged.
+   ========================================================= */
+
+:root {
+  color-scheme: light;
+  --app-bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface-muted: #f7f7f8;
+  --ink: #25282d;
+  --ink-soft: #515760;
+  --muted: #777d86;
+  --line: #e2e4e8;
+  --line-strong: #d3d6dc;
+  --accent: #e97822;
+  --accent-hover: #cc6113;
+  --accent-soft: #fff0e4;
+  --success: #347454;
+  --success-soft: #e8f3ec;
+  --danger: #b42318;
+  --danger-soft: #fff0ef;
+  --shadow-sm: 0 2px 8px rgba(28, 32, 38, 0.04);
+  --shadow-md: 0 8px 24px rgba(28, 32, 38, 0.07);
+  --radius-card: 18px;
+  --radius-control: 12px;
+  --focus-ring: 0 0 0 3px rgba(233, 120, 34, 0.22);
+}
+
+.app,
+.handoff-screen,
+.handoff-history-screen,
+.tasks-screen {
+  background: var(--app-bg);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.top-bar,
+.screen-header {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: 0 1px 0 rgba(28, 32, 38, 0.02);
+}
+
+.top-bar {
+  padding: 18px 24px;
+}
+
+.brand {
+  gap: 11px;
+}
+
+.brand-icon {
+  background: var(--ink);
+  border-radius: 11px;
+  box-shadow: none;
+}
+
+.brand span {
+  color: var(--muted);
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+
+.brand strong {
+  color: var(--ink);
+  letter-spacing: -0.45px;
+  font-weight: 700;
+}
+
+.menu-button,
+.back-button {
+  background: var(--surface-muted);
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+}
+
+.main-content,
+.handoff-content,
+.history-content,
+.tasks-content {
+  width: min(760px, calc(100% - 40px));
+}
+
+.main-content {
+  padding-top: 32px;
+}
+
+.handoff-content,
+.history-content,
+.tasks-content {
+  padding-top: 30px;
+}
+
+.eyebrow,
+.screen-eyebrow,
+.task-progress-eyebrow {
+  color: var(--muted);
+  letter-spacing: 1.25px;
+}
+
+.welcome h1,
+.screen-header h1,
+.handoff-intro h2,
+.history-intro h2,
+.tasks-intro h2,
+.task-progress-heading h2 {
+  color: var(--ink);
+  letter-spacing: -0.55px;
+  font-weight: 700;
+}
+
+.welcome h1 {
+  font-size: clamp(28px, 4vw, 34px);
+}
+
+.welcome p:last-child,
+.handoff-intro p,
+.history-intro p,
+.tasks-intro p {
+  color: var(--ink-soft);
+}
+
+.handoff-card {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-md);
+}
+
+.handoff-card h2 {
+  color: var(--ink);
+}
+
+.card-icon {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.card-label {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.attention-item {
+  background: var(--surface-muted);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.dot {
+  background: var(--accent);
+}
+
+.dot.red {
+  background: #d64545;
+}
+
+.dot.purple {
+  background: var(--accent);
+}
+
+.text-button,
+.task-progress-link {
+  color: var(--accent-hover);
+}
+
+.quick-actions {
+  gap: 14px;
+}
+
+.quick-card,
+.add-handoff,
+.task-progress-card,
+.history-card,
+.task-card,
+.empty-history,
+.empty-tasks {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.quick-card {
+  min-height: 128px;
+  padding: 19px;
+}
+
+.quick-card:hover,
+.add-handoff:hover,
+.task-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.quick-icon {
+  color: var(--ink-soft);
+}
+
+.quick-card strong,
+.add-handoff strong {
+  color: var(--ink);
+}
+
+.quick-card small,
+.add-handoff small {
+  color: var(--muted);
+}
+
+.add-handoff {
+  border-radius: 15px;
+}
+
+.add-handoff>span:first-child {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  border-radius: 12px;
+}
+
+.add-handoff .arrow {
+  color: var(--accent);
+}
+
+.bottom-nav {
+  background: rgba(255, 255, 255, 0.97);
+  border-color: var(--line);
+  box-shadow: 0 -4px 18px rgba(28, 32, 38, 0.035);
+  gap: clamp(24px, 7vw, 54px);
+}
+
+.nav-item {
+  color: #777d86;
+}
+
+.nav-item.active {
+  color: var(--accent-hover);
+}
+
+.screen-header {
+  padding: 18px 24px;
+}
+
+.back-button {
+  flex: 0 0 40px;
+}
+
+.large-mic-icon {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  border: 1px solid #f4c7a5;
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.large-mic-icon.listening {
+  background: #ffe1ca;
+  box-shadow: 0 0 0 7px rgba(233, 120, 34, 0.12), 0 0 0 14px rgba(233, 120, 34, 0.06);
+}
+
+.note-section label,
+.category-section label {
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.note-section textarea,
+.add-task-section input {
+  border-color: var(--line-strong);
+  border-radius: 13px;
+  color: var(--ink);
+  box-shadow: none;
+  font: inherit;
+  font-size: 14px;
+}
+
+.note-section textarea::placeholder,
+.add-task-section input::placeholder {
+  color: #8b9098;
+}
+
+.note-section textarea:focus,
+.add-task-section input:focus {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+.category-button,
+.history-filter {
+  border-color: var(--line-strong);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  background: var(--surface);
+}
+
+.category-button:hover,
+.history-filter:hover {
+  border-color: #e7a16e;
+}
+
+.category-button.selected,
+.history-filter.selected {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.save-handoff,
+.add-task-section button {
+  background: var(--accent);
+  color: #ffffff;
+  border-radius: 13px;
+  box-shadow: 0 4px 10px rgba(201, 93, 18, 0.16);
+  font-size: 14px;
+}
+
+.save-handoff:hover:not(:disabled),
+.add-task-section button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 6px 14px rgba(201, 93, 18, 0.2);
+}
+
+.history-card,
+.task-card {
+  border-radius: 15px;
+}
+
+.history-category,
+.task-section-heading span {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  border-radius: 8px;
+}
+
+.history-time {
+  color: var(--muted);
+}
+
+.history-card p,
+.task-card {
+  color: var(--ink);
+}
+
+.empty-history,
+.empty-tasks {
+  background: rgba(255, 255, 255, 0.8);
+  border-style: dashed;
+  border-color: var(--line-strong);
+}
+
+.empty-icon,
+.empty-task-icon {
+  background: var(--surface-muted);
+  color: var(--ink-soft);
+}
+
+.task-progress-card {
+  padding: 22px;
+}
+
+.task-progress-percent {
+  color: var(--accent-hover);
+}
+
+.task-progress-track {
+  background: #eceef1;
+}
+
+.task-progress-fill {
+  background: var(--accent);
+}
+
+.task-progress-summary {
+  color: var(--muted);
+}
+
+.task-progress-summary strong {
+  color: var(--ink);
+}
+
+.task-checkbox {
+  border-color: #b9bec6;
+}
+
+.task-checkbox.checked {
+  border-color: var(--success);
+  background: var(--success);
+}
+
+.task-card.completed .task-title {
+  color: var(--muted);
+}
+
+.discard-overlay {
+  background: rgba(24, 28, 34, 0.48);
+}
+
+.discard-dialog {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.discard-dialog h2 {
+  color: var(--ink);
+}
+
+.discard-dialog p {
+  color: var(--ink-soft);
+}
+
+.keep-editing-button {
+  background: var(--surface-muted);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.discard-button {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.edit-handoff-button {
+  border-color: #f0c9ac;
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.edit-handoff-button:hover {
+  border-color: #e9a16c;
+  background: #ffe6d3;
+}
+
+.delete-handoff-button {
+  border-color: #f0cecb;
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.delete-handoff-button:hover {
+  border-color: #e5aaa5;
+  background: #ffe7e5;
+}
+
+.save-toast {
+  border-color: #c7e4d2;
+  background: #f0f8f2;
+  color: #286344;
+  box-shadow: var(--shadow-md);
+}
+
+.save-toast-icon {
+  background: #dcefe2;
+  color: #286344;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .top-bar {
+    padding: 16px;
+  }
+
+  .main-content,
+  .handoff-content,
+  .history-content,
+  .tasks-content {
+    width: calc(100% - 28px);
+  }
+
+  .main-content {
+    padding-top: 26px;
+  }
+
+  .handoff-content,
+  .history-content,
+  .tasks-content {
+    padding-top: 24px;
+  }
+
+  .welcome h1 {
+    font-size: 28px;
+    letter-spacing: -0.65px;
+  }
+
+  .handoff-card {
+    padding: 20px;
+    border-radius: 17px;
+  }
+
+  .quick-card {
+    min-height: 118px;
+    padding: 15px;
+  }
+
+  .bottom-nav {
+    justify-content: space-around;
+    gap: 8px;
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .nav-item {
+    min-width: 48px;
+  }
+
+  .screen-header {
+    padding: 16px;
+  }
+
+  .handoff-intro h2 {
+    font-size: 21px;
+  }
+
+  .note-section textarea {
+    min-height: 145px;
+  }
+
+  .history-card {
+    padding: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* Animated multicolor border for Shift Handoff */
+.handoff-card {
+  position: relative;
+  isolation: isolate;
+  border: 2px solid transparent !important;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(
+      110deg,
+      #f59e0b,
+      #fb7185,
+      #8b5cf6,
+      #3b82f6,
+      #34d399,
+      #f59e0b
+    ) border-box !important;
+  background-size: 100% 100%, 300% 300%;
+  animation: handoff-border-flow 8s linear infinite;
+}
+
+@keyframes handoff-border-flow {
+  0% {
+    background-position: 0 0, 0% 50%;
+  }
+
+  100% {
+    background-position: 0 0, 300% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .handoff-card {
+    animation: none;
+  }
+}
+
+/* Persistent navigation: mobile layout and safe area */
+
+.app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
+}
+
+.handoff-screen,
+.handoff-history-screen,
+.tasks-screen {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+.bottom-nav {
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+}
+
+.nav-item {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  justify-content: center;
+  gap: 5px;
+}
+
+.nav-item svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.nav-item span {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+@media (max-width: 600px) {
+  .app {
+    padding-bottom: calc(78px + env(safe-area-inset-bottom));
+  }
+
+  .bottom-nav {
+    justify-content: space-around;
+    gap: 4px;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .nav-item {
+    padding: 4px 0;
+  }
+
+  .handoff-screen,
+  .handoff-history-screen,
+  .tasks-screen {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+}
