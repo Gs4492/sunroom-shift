@@ -95,6 +95,13 @@ function App() {
   const [successMessage, setSuccessMessage] = useState('')
   const [pushMessage, setPushMessage] = useState('')
 
+  const [notificationsEnabled, setNotificationsEnabled] = useState(
+    typeof Notification !== 'undefined' &&
+    Notification.permission === 'granted'
+  )
+
+
+
   useEffect(() => {
     if (!successMessage) return
 
@@ -112,6 +119,10 @@ function App() {
     try {
       const message = await enablePushNotifications()
       setPushMessage(message)
+      setNotificationsEnabled(
+        typeof Notification !== 'undefined' &&
+        Notification.permission === 'granted'
+      )
     } catch (error) {
       console.error('Push setup failed:', error)
       setPushMessage(
@@ -468,8 +479,11 @@ function App() {
             className="notification-button"
             type="button"
             onClick={handleEnableNotifications}
+            disabled={notificationsEnabled}
           >
-            Enable Notifications
+            {notificationsEnabled
+              ? '✓ Notifications Enabled'
+              : 'Enable Notifications'}
           </button>
 
           {pushMessage && <p role="status">{pushMessage}</p>}
