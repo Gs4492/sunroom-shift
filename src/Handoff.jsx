@@ -44,6 +44,9 @@ function Handoff({
     editingHandoff?.note || ''
   )
 
+  const [categoryManuallySelected, setCategoryManuallySelected] =
+    useState(false)
+
   const [createdBy, setCreatedBy] = useState(
     editingHandoff?.createdBy || ''
   )
@@ -80,9 +83,8 @@ function Handoff({
     if (!transcript.trim()) return
 
     setNote(transcript)
-
-    const detectedCategory = detectCategory(transcript)
-    setCategory(detectedCategory)
+    setCategoryManuallySelected(false)
+    setCategory(detectCategory(transcript))
   }, [transcript])
 
   const handleMicrophone = () => {
@@ -206,7 +208,14 @@ function Handoff({
           <textarea
             id="handoff-note"
             value={note}
-            onChange={(event) => setNote(event.target.value)}
+            onChange={(event) => {
+              const typedNote = event.target.value
+              setNote(typedNote)
+
+              if (!categoryManuallySelected) {
+                setCategory(detectCategory(typedNote))
+              }
+            }}
             placeholder="Example: We're running low on potting soil..."
             rows="6"
           />
@@ -240,7 +249,10 @@ function Handoff({
                     ? 'category-button selected'
                     : 'category-button'
                 }
-                onClick={() => setCategory(item)}
+                onClick={() => {
+                  setCategory(item)
+                  setCategoryManuallySelected(true)
+                }}
               >
                 {item}
               </button>

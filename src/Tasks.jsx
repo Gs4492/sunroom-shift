@@ -29,6 +29,7 @@ function Icon({ name, size = 20 }) {
 function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
   const [newTask, setNewTask] = useState('')
   const [createdBy, setCreatedBy] = useState('')
+  const [showAllCompleted, setShowAllCompleted] = useState(false)
 
 
   const handleAddTask = () => {
@@ -53,6 +54,10 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
   const completedTasks = tasks.filter(
     (task) => task.completed
   )
+
+  const visibleCompletedTasks = showAllCompleted
+    ? completedTasks
+    : completedTasks.slice(0, 5)
 
   return (
     <div className="tasks-screen">
@@ -161,33 +166,45 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
           </div>
         </section>
 
+
         {completedTasks.length > 0 && (
           <section className="task-section completed-section">
             <div className="task-section-heading">
               <h3>Completed</h3>
-
               <span>{completedTasks.length}</span>
             </div>
 
-            <div className="task-list">
-              {completedTasks.map((task) => (
-                <button
-                  type="button"
-                  className="task-card completed"
-                  key={task.id}
-                  onClick={() => onToggleTask(task.id)}
-                  aria-label={`Mark ${task.title} as incomplete`}
-                >
-                  <span className="task-checkbox checked">
-                    <Icon name="check" size={15} />
-                  </span>
+            <div className="completed-task-scroll">
+              <div className="task-list">
+                {visibleCompletedTasks.map((task) => (
+                  <button
+                    type="button"
+                    className="task-card completed"
+                    key={task.id}
+                    onClick={() => onToggleTask(task.id)}
+                    aria-label={`Mark ${task.title} as incomplete`}
+                  >
+                    <span className="task-checkbox checked">
+                      <Icon name="check" size={15} />
+                    </span>
 
-                  <span className="task-title">
-                    {task.title}
-                  </span>
-                </button>
-              ))}
+                    <span className="task-title">
+                      {task.title}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {completedTasks.length > 5 && (
+              <button
+                type="button"
+                className="completed-toggle"
+                onClick={() => setShowAllCompleted((current) => !current)}
+              >
+                {showAllCompleted ? 'Show fewer' : 'View all completed'}
+              </button>
+            )}
           </section>
         )}
       </main>

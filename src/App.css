@@ -3497,3 +3497,83 @@ button:disabled {
 }
 
 
+
+.notification-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.notification-button:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+.notification-button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.notification-button:active {
+  transform: scale(0.98);
+}
+
+.welcome [role="status"] {
+  margin: 5px 0 0;
+  color: var(--success);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+
+/* Compact completed-task list */
+.completed-task-scroll {
+  max-height: 360px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+  border-radius: var(--radius-card);
+}
+
+.completed-task-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.completed-task-scroll::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 10px;
+}
+
+.completed-toggle {
+  display: block;
+  margin: 10px auto 0;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.completed-toggle:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+

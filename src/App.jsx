@@ -340,14 +340,22 @@ function App() {
     showSuccessMessage('Task added successfully!')
   }
 
+
   const toggleTask = async (taskId) => {
     const task = tasks.find((item) => item.id === taskId)
 
     if (!task) return
 
+    const isCompleting = !task.completed
+
     const { data, error } = await supabase
       .from('tasks')
-      .update({ completed: !task.completed })
+      .update({
+        completed: isCompleting,
+        completed_at: isCompleting
+          ? new Date().toISOString()
+          : null,
+      })
       .eq('id', taskId)
       .select()
       .single()
@@ -364,6 +372,7 @@ function App() {
       )
     )
   }
+
 
   const openHistory = (category = 'All') => {
     setHistoryCategory(category)
@@ -454,7 +463,12 @@ function App() {
           <p className="eyebrow">{formattedDate.toUpperCase()}</p>
           <h1>Welcome to Sunroom Shift</h1>
           <p>Review shift handoffs and track shop tasks.</p>
-          <button type="button" onClick={handleEnableNotifications}>
+
+          <button
+            className="notification-button"
+            type="button"
+            onClick={handleEnableNotifications}
+          >
             Enable Notifications
           </button>
 
