@@ -1610,7 +1610,7 @@
   width: 100%;
   min-height: 46px;
   align-self: stretch;
-
+  align-self: flex-start;
 
   padding: 0 18px;
 
@@ -3495,3 +3495,5 @@ button:disabled {
   font-weight: 700;
   line-height: 1.5;
 }
+
+

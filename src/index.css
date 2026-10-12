@@ -1,29 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
+
 :root {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  color: #25282d;
-  background: #f3f4f6;
+  color: #252b27;
+  background: #f7f6f1;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --app-bg: #f3f4f6;
+  /* Sunroom Plants-inspired palette */
+  --app-bg: #f7f6f1;
   --surface: #ffffff;
-  --surface-muted: #f7f7f8;
-  --ink: #25282d;
-  --ink-soft: #515760;
-  --muted: #777d86;
-  --line: #e2e4e8;
+  --surface-muted: #f1f2ec;
+  --ink: #252b27;
+  --ink-soft: #505950;
+  --muted: #777e76;
+  --line: #e5e6df;
+  --line-strong: #d4d8ce;
+
+  /* Keep orange as the primary action color */
   --accent: #e97822;
   --accent-hover: #cc6113;
   --accent-soft: #fff0e4;
-  --success: #347454;
+
+  /* Restrained botanical accents */
+  --success: #526b52;
+  --success-soft: #e8eee4;
   --danger: #b42318;
+  --danger-soft: #fff0ef;
+
   --radius-card: 18px;
   --radius-control: 12px;
 }
+
 
 * {
   box-sizing: border-box;

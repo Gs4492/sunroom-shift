@@ -1,0 +1,18 @@
+{
+  "name": "Sunroom Shift",
+  "short_name": "Sunroom Shift",
+  "description": "Shift handoffs and task tracking for Sunroom Plants",
+  "start_url": "/sunroom-shift/",
+  "scope": "/sunroom-shift/",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#e97822",
+  "icons": [
+    {
+      "src": "/sunroom-shift/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

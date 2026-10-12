@@ -6,6 +6,7 @@ import HandoffHistory from './HandoffHistory'
 import Tasks from './Tasks'
 import { supabase } from './supabaseClient'
 import sunroomLogo from './assets/sunroom-plants-logo.png'
+import { enablePushNotifications } from './pushNotifications'
 
 function Icon({ name, size = 20, strokeWidth = 1.8 }) {
   const common = {
@@ -92,6 +93,7 @@ function App() {
   const [historyCategory, setHistoryCategory] = useState('All')
   const [editingHandoff, setEditingHandoff] = useState(null)
   const [successMessage, setSuccessMessage] = useState('')
+  const [pushMessage, setPushMessage] = useState('')
 
   useEffect(() => {
     if (!successMessage) return
@@ -105,6 +107,19 @@ function App() {
 
   const showSuccessMessage = (message) => {
     setSuccessMessage(message)
+  }
+  const handleEnableNotifications = async () => {
+    try {
+      const message = await enablePushNotifications()
+      setPushMessage(message)
+    } catch (error) {
+      console.error('Push setup failed:', error)
+      setPushMessage(
+        error instanceof Error
+          ? error.message
+          : 'Could not enable notifications.',
+      )
+    }
   }
 
   const [handoffs, setHandoffs] = useState([])
@@ -439,6 +454,11 @@ function App() {
           <p className="eyebrow">{formattedDate.toUpperCase()}</p>
           <h1>Welcome to Sunroom Shift</h1>
           <p>Review shift handoffs and track shop tasks.</p>
+          <button type="button" onClick={handleEnableNotifications}>
+            Enable Notifications
+          </button>
+
+          {pushMessage && <p role="status">{pushMessage}</p>}
         </section>
 
         <section className="handoff-card">
