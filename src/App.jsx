@@ -336,6 +336,7 @@ function App() {
       .insert({
         title: newTask.title,
         created_by: newTask.createdBy,
+        assigned_to: newTask.assignedTo,
         completed: false,
       })
       .select()

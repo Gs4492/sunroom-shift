@@ -28,8 +28,12 @@ function Icon({ name, size = 20 }) {
 
 function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
   const [newTask, setNewTask] = useState('')
+  const [assignMode, setAssignMode] = useState('self')
+  const [otherAssignee, setOtherAssignee] = useState('')
   const [createdBy, setCreatedBy] = useState('')
   const [showAllCompleted, setShowAllCompleted] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [visibleOpenCount, setVisibleOpenCount] = useState(10)
 
 
   const handleAddTask = () => {
@@ -37,9 +41,21 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
       return
     }
 
+    const assignedTo =
+      assignMode === 'self'
+        ? createdBy.trim()
+        : assignMode === 'other'
+          ? otherAssignee.trim()
+          : null
+
+    if (assignMode === 'other' && !otherAssignee.trim()) {
+      return
+    }
+
     onAddTask({
       title: newTask.trim(),
       createdBy: createdBy.trim(),
+      assignedTo,
     })
 
     setNewTask('')
@@ -48,10 +64,14 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
 
   const handleToggleTask = (task) => {
     const action = task.completed ? 'reopen' : 'complete'
+    const assignee = task.assigned_to
+    const creator = task.created_by || task.createdBy
 
     const message =
       action === 'complete'
-        ? `Mark "${task.title}" as completed?`
+        ? assignee
+          ? `Mark "${task.title}" as completed for ${assignee}?`
+          : `Mark "${task.title}" as completed? Added by ${creator || 'Unknown'}.`
         : `Reopen "${task.title}"?`
 
     if (window.confirm(message)) {
@@ -67,6 +87,26 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
   const completedTasks = tasks.filter(
     (task) => task.completed
   )
+
+  const filteredOpenTasks = openTasks.filter((task) => {
+    const query = searchQuery.trim().toLowerCase()
+
+    if (!query) return true
+
+    const title = (task.title || '').toLowerCase()
+    const author = (task.created_by || task.createdBy || '').toLowerCase()
+    const assignee = (task.assigned_to || task.assignedTo || '').toLowerCase()
+
+    return (
+      title.includes(query) ||
+      author.includes(query) ||
+      assignee.includes(query)
+    )
+
+    return title.includes(query) || author.includes(query)
+  })
+
+  const visibleOpenTasks = filteredOpenTasks.slice(0, visibleOpenCount)
 
   const visibleCompletedTasks = showAllCompleted
     ? completedTasks
@@ -116,7 +156,6 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
             aria-label="New task"
           />
 
-
           <input
             type="text"
             value={createdBy}
@@ -127,10 +166,40 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
           />
 
 
+          <div className="task-assignment">
+            <label htmlFor="assignMode">Assign to</label>
+
+            <select
+              id="assignMode"
+              value={assignMode}
+              onChange={(event) => setAssignMode(event.target.value)}
+            >
+              <option value="self">Myself</option>
+              <option value="other">Someone else</option>
+              <option value="none">Unassigned</option>
+            </select>
+
+            {assignMode === 'other' && (
+              <input
+                type="text"
+                value={otherAssignee}
+                onChange={(event) => setOtherAssignee(event.target.value)}
+                placeholder="Enter assignee's name"
+                aria-label="Assignee's name"
+                maxLength={60}
+              />
+            )}
+          </div>
+
+
           <button
             type="button"
             onClick={handleAddTask}
-            disabled={!newTask.trim() || !createdBy.trim()}
+            disabled={
+              !newTask.trim() ||
+              !createdBy.trim() ||
+              (assignMode === 'other' && !otherAssignee.trim())
+            }
           >
             Add
           </button>
@@ -144,6 +213,17 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
           </div>
 
           <div className="task-list">
+            <input
+              type="search"
+              className="task-search"
+              value={searchQuery}
+              onChange={(event) => {
+                setSearchQuery(event.target.value)
+                setVisibleOpenCount(10)
+              }}
+              placeholder="Search tasks or names..."
+              aria-label="Search open tasks"
+            />
             {openTasks.length === 0 ? (
               <div className="empty-tasks">
                 <div className="empty-task-icon">
@@ -153,7 +233,7 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
                 <p>Nothing needs to be done right now.</p>
               </div>
             ) : (
-              openTasks.map((task) => (
+              visibleOpenTasks.map((task) => (
                 <button
                   type="button"
                   className="task-card"
@@ -166,6 +246,13 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
 
                   <span className="task-details">
                     <span className="task-title">{task.title}</span>
+
+                    {task.assigned_to && (
+                      <span className="task-author">
+                        Assigned to {task.assigned_to}
+                      </span>
+                    )}
+
                     {task.created_by && (
                       <span className="task-author">
                         Added by {task.created_by}
@@ -177,6 +264,17 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
               ))
             )}
           </div>
+          {filteredOpenTasks.length > visibleOpenCount && (
+            <button
+              type="button"
+              className="completed-toggle"
+              onClick={() =>
+                setVisibleOpenCount((count) => count + 10)
+              }
+            >
+              Load 10 more
+            </button>
+          )}
         </section>
 
 
