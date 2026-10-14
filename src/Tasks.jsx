@@ -46,6 +46,19 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
     setCreatedBy('')
   }
 
+  const handleToggleTask = (task) => {
+    const action = task.completed ? 'reopen' : 'complete'
+
+    const message =
+      action === 'complete'
+        ? `Mark "${task.title}" as completed?`
+        : `Reopen "${task.title}"?`
+
+    if (window.confirm(message)) {
+      onToggleTask(task.id)
+    }
+  }
+
 
   const openTasks = tasks.filter(
     (task) => !task.completed
@@ -117,7 +130,7 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
           <button
             type="button"
             onClick={handleAddTask}
-            disabled={!newTask.trim()}
+            disabled={!newTask.trim() || !createdBy.trim()}
           >
             Add
           </button>
@@ -145,7 +158,7 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
                   type="button"
                   className="task-card"
                   key={task.id}
-                  onClick={() => onToggleTask(task.id)}
+                  onClick={() => handleToggleTask(task)}
                   aria-label={`Mark ${task.title} as completed`}
                 >
                   <span className="task-checkbox" />
@@ -181,7 +194,7 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
                     type="button"
                     className="task-card completed"
                     key={task.id}
-                    onClick={() => onToggleTask(task.id)}
+                    onClick={() => handleToggleTask(task)}
                     aria-label={`Mark ${task.title} as incomplete`}
                   >
                     <span className="task-checkbox checked">
