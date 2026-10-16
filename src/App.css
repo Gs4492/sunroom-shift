@@ -3637,20 +3637,36 @@ button:disabled {
 .task-assignment input {
   width: 100%;
   box-sizing: border-box;
-  padding: 9px 11px;
-  border: 1px solid #dfe3e8;
-  border-radius: 9px;
-  background: #fff;
-  color: #25313f;
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+  padding: 11px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
   font: inherit;
   font-size: 13px;
+  line-height: 20px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task-assignment select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 11px 32px 11px 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23515760' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  cursor: pointer;
 }
 
 .task-assignment select:focus,
 .task-assignment input:focus {
   outline: none;
-  border-color: #a0aab8;
-  box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.1);
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
 }
 
 
@@ -3679,17 +3695,22 @@ button:disabled {
 
 .task-planning-fields {
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .task-priority-field,
 .task-due-date-field {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .task-priority-field label,
@@ -3697,21 +3718,77 @@ button:disabled {
   color: var(--ink-soft);
   font-size: 12px;
   font-weight: 600;
+  line-height: 16px;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+.add-task-section .task-priority-field select,
+.add-task-section .task-due-date-field input,
 .task-priority-field select,
 .task-due-date-field input {
+  display: block;
   box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
   min-width: 0;
+  height: 44px;
   min-height: 44px;
-  padding: 10px 11px;
+  max-height: 44px;
+  padding: 11px 12px;
   border: 1px solid var(--line-strong);
   border-radius: 12px;
   background: var(--surface);
   color: var(--ink);
   font: inherit;
   font-size: 13px;
+  line-height: 20px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.add-task-section .task-priority-field select,
+.task-priority-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 11px 32px 11px 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23515760' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  cursor: pointer;
+}
+
+.add-task-section .task-due-date-field input,
+.task-due-date-field input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 11px 12px;
+  cursor: pointer;
+}
+
+.add-task-section .task-due-date-field input::-webkit-date-and-time-value,
+.task-due-date-field input::-webkit-date-and-time-value {
+  margin: 0;
+  padding: 0;
+  min-height: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: left;
+}
+
+.add-task-section .task-due-date-field input::-webkit-calendar-picker-indicator,
+.task-due-date-field input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.65;
+  padding: 0;
+  margin: auto 0;
+}
+
+.add-task-section .task-due-date-field input::-webkit-calendar-picker-indicator:hover,
+.task-due-date-field input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
 }
 
 .task-priority-field select:focus,
@@ -3790,9 +3867,10 @@ button:disabled {
   line-height: 1.5;
 }
 
-@media (max-width: 380px) {
+@media (max-width: 330px) {
   .task-planning-fields {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
 }
 
