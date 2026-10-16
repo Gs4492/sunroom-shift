@@ -48,7 +48,7 @@ function Handoff({
     useState(false)
 
   const [createdBy, setCreatedBy] = useState(
-    editingHandoff?.createdBy || ''
+    editingHandoff?.createdBy || editingHandoff?.created_by || ''
   )
 
   const [showDiscardConfirmation, setShowDiscardConfirmation] =
@@ -73,11 +73,14 @@ function Handoff({
 
   const originalNote = editingHandoff?.note || ''
   const originalCategory = editingHandoff?.category || 'General'
+  const originalCreatedBy =
+    editingHandoff?.createdBy || editingHandoff?.created_by || ''
 
   const hasUnsavedChanges = editingHandoff
     ? note.trim() !== originalNote.trim() ||
-    category !== originalCategory
-    : note.trim().length > 0
+      category !== originalCategory ||
+      createdBy.trim() !== originalCreatedBy.trim()
+    : note.trim().length > 0 || createdBy.trim().length > 0
 
   useEffect(() => {
     if (!transcript.trim()) return
@@ -265,7 +268,7 @@ function Handoff({
           type="button"
           className="save-handoff"
           onClick={handleSave}
-          disabled={!note.trim()}
+          disabled={!note.trim() || !createdBy.trim()}
         >
           {editingHandoff ? 'Save Changes' : 'Save Handoff'}
         </button>

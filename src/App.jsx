@@ -156,6 +156,7 @@ function App() {
         data.map((handoff) => ({
           ...handoff,
           createdAt: handoff.created_at,
+          createdBy: handoff.created_by,
         }))
       )
 
@@ -210,6 +211,7 @@ function App() {
             data.map((handoff) => ({
               ...handoff,
               createdAt: handoff.created_at,
+              createdBy: handoff.created_by,
             }))
           )
         }
@@ -263,6 +265,7 @@ function App() {
     const savedHandoff = {
       ...data,
       createdAt: data.created_at,
+      createdBy: data.created_by,
     }
 
     setHandoffs((currentHandoffs) => [
@@ -296,6 +299,7 @@ function App() {
     const savedHandoff = {
       ...data,
       createdAt: data.created_at,
+      createdBy: data.created_by,
     }
 
     setHandoffs((currentHandoffs) =>

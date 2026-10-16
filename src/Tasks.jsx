@@ -102,8 +102,6 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
       author.includes(query) ||
       assignee.includes(query)
     )
-
-    return title.includes(query) || author.includes(query)
   })
 
   const visibleOpenTasks = filteredOpenTasks.slice(0, visibleOpenCount)
