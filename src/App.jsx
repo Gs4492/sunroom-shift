@@ -334,6 +334,7 @@ function App() {
   }
 
 
+
   const addTask = async (newTask) => {
     const { data, error } = await supabase
       .from('tasks')
@@ -341,6 +342,8 @@ function App() {
         title: newTask.title,
         created_by: newTask.createdBy,
         assigned_to: newTask.assignedTo,
+        priority: newTask.priority || 'normal',
+        due_date: newTask.dueDate || null,
         completed: false,
       })
       .select()
@@ -355,6 +358,7 @@ function App() {
     setTasks((currentTasks) => [data, ...currentTasks])
     showSuccessMessage('Task added successfully!')
   }
+
 
 
   const toggleTask = async (taskId) => {

@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 
 function Icon({ name, size = 20 }) {
@@ -26,15 +27,47 @@ function Icon({ name, size = 20 }) {
   return <svg {...common}>{icons[name]}</svg>
 }
 
+function getTodayDate() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+function formatDueDate(dateString) {
+  if (!dateString) return ''
+
+  const [year, month, day] = dateString.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
+
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: year !== new Date().getFullYear() ? 'numeric' : undefined,
+  })
+}
+
+function isTaskOverdue(task) {
+  return Boolean(
+    !task.completed &&
+    task.due_date &&
+    task.due_date < getTodayDate()
+  )
+}
+
 function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
   const [newTask, setNewTask] = useState('')
   const [assignMode, setAssignMode] = useState('self')
   const [otherAssignee, setOtherAssignee] = useState('')
   const [createdBy, setCreatedBy] = useState('')
+  const [priority, setPriority] = useState('normal')
+  const [dueDate, setDueDate] = useState('')
   const [showAllCompleted, setShowAllCompleted] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [priorityFilter, setPriorityFilter] = useState('all')
   const [visibleOpenCount, setVisibleOpenCount] = useState(10)
-
 
   const handleAddTask = () => {
     if (!newTask.trim() || !createdBy.trim()) {
@@ -56,10 +89,16 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
       title: newTask.trim(),
       createdBy: createdBy.trim(),
       assignedTo,
+      priority,
+      dueDate: dueDate || null,
     })
 
     setNewTask('')
     setCreatedBy('')
+    setOtherAssignee('')
+    setAssignMode('self')
+    setPriority('normal')
+    setDueDate('')
   }
 
   const handleToggleTask = (task) => {
@@ -79,28 +118,31 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
     }
   }
 
-
-  const openTasks = tasks.filter(
-    (task) => !task.completed
-  )
-
-  const completedTasks = tasks.filter(
-    (task) => task.completed
-  )
+  const openTasks = tasks.filter((task) => !task.completed)
+  const completedTasks = tasks.filter((task) => task.completed)
+  const overdueTasks = openTasks.filter(isTaskOverdue)
 
   const filteredOpenTasks = openTasks.filter((task) => {
     const query = searchQuery.trim().toLowerCase()
+    const taskPriority = (task.priority || 'normal').toLowerCase()
 
+    const matchesPriority =
+      priorityFilter === 'all' || taskPriority === priorityFilter
+
+    if (!matchesPriority) return false
     if (!query) return true
 
     const title = (task.title || '').toLowerCase()
     const author = (task.created_by || task.createdBy || '').toLowerCase()
     const assignee = (task.assigned_to || task.assignedTo || '').toLowerCase()
+    const taskDueDate = (task.due_date || '').toLowerCase()
 
     return (
       title.includes(query) ||
       author.includes(query) ||
-      assignee.includes(query)
+      assignee.includes(query) ||
+      taskPriority.includes(query) ||
+      taskDueDate.includes(query)
     )
   })
 
@@ -123,10 +165,7 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
         </button>
 
         <div>
-          <span className="screen-eyebrow">
-            SHIFT TASKS
-          </span>
-
+          <span className="screen-eyebrow">SHIFT TASKS</span>
           <h1>Tasks</h1>
         </div>
       </header>
@@ -134,10 +173,7 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
       <main className="tasks-content">
         <section className="tasks-intro">
           <h2>What needs to get done?</h2>
-
-          <p>
-            Keep track of tasks for the shop and the next shift.
-          </p>
+          <p>Keep track of tasks for the shop and the next shift.</p>
         </section>
 
         <section className="add-task-section">
@@ -146,9 +182,7 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
             value={newTask}
             onChange={(event) => setNewTask(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                handleAddTask()
-              }
+              if (event.key === 'Enter') handleAddTask()
             }}
             placeholder="Add a task..."
             aria-label="New task"
@@ -162,7 +196,6 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
             aria-label="Your name"
             maxLength={60}
           />
-
 
           <div className="task-assignment">
             <label htmlFor="assignMode">Assign to</label>
@@ -189,6 +222,31 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
             )}
           </div>
 
+          <div className="task-planning-fields">
+            <div className="task-priority-field">
+              <label htmlFor="taskPriority">Priority</label>
+              <select
+                id="taskPriority"
+                value={priority}
+                onChange={(event) => setPriority(event.target.value)}
+              >
+                <option value="urgent">Urgent</option>
+                <option value="normal">Normal</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+
+            <div className="task-due-date-field">
+              <label htmlFor="taskDueDate">Due date (optional)</label>
+              <input
+                id="taskDueDate"
+                type="date"
+                value={dueDate}
+                min={getTodayDate()}
+                onChange={(event) => setDueDate(event.target.value)}
+              />
+            </div>
+          </div>
 
           <button
             type="button"
@@ -206,75 +264,125 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
         <section className="task-section">
           <div className="task-section-heading">
             <h3>Open Tasks</h3>
-
             <span>{openTasks.length}</span>
           </div>
 
+          {overdueTasks.length > 0 && (
+            <p className="task-overdue-summary" role="status">
+              {overdueTasks.length} overdue{' '}
+              {overdueTasks.length === 1 ? 'task' : 'tasks'} need attention.
+            </p>
+          )}
+
           <div className="task-list">
-            <input
-              type="search"
-              className="task-search"
-              value={searchQuery}
-              onChange={(event) => {
-                setSearchQuery(event.target.value)
-                setVisibleOpenCount(10)
-              }}
-              placeholder="Search tasks or names..."
-              aria-label="Search open tasks"
-            />
+            <div className="task-search-controls">
+              <input
+                type="search"
+                className="task-search"
+                value={searchQuery}
+                onChange={(event) => {
+                  setSearchQuery(event.target.value)
+                  setVisibleOpenCount(10)
+                }}
+                placeholder="Search tasks or names..."
+                aria-label="Search open tasks"
+              />
+
+              <select
+                className="task-priority-filter"
+                value={priorityFilter}
+                onChange={(event) => {
+                  setPriorityFilter(event.target.value)
+                  setVisibleOpenCount(10)
+                }}
+                aria-label="Filter tasks by priority"
+              >
+                <option value="all">All priorities</option>
+                <option value="urgent">Urgent</option>
+                <option value="normal">Normal</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+
             {openTasks.length === 0 ? (
               <div className="empty-tasks">
                 <div className="empty-task-icon">
                   <Icon name="check" size={22} />
                 </div>
-
                 <p>Nothing needs to be done right now.</p>
               </div>
+            ) : filteredOpenTasks.length === 0 ? (
+              <div className="empty-tasks">
+                <p>No tasks match your search.</p>
+              </div>
             ) : (
-              visibleOpenTasks.map((task) => (
-                <button
-                  type="button"
-                  className="task-card"
-                  key={task.id}
-                  onClick={() => handleToggleTask(task)}
-                  aria-label={`Mark ${task.title} as completed`}
-                >
-                  <span className="task-checkbox" />
+              visibleOpenTasks.map((task) => {
+                const overdue = isTaskOverdue(task)
+                const taskPriority = task.priority || 'normal'
 
+                return (
+                  <button
+                    type="button"
+                    className={`task-card${overdue ? ' overdue' : ''}`}
+                    key={task.id}
+                    onClick={() => handleToggleTask(task)}
+                    aria-label={`Mark ${task.title} as completed`}
+                  >
+                    <span className="task-checkbox" />
 
-                  <span className="task-details">
-                    <span className="task-title">{task.title}</span>
+                    <span className="task-details">
+                      <span className="task-title">{task.title}</span>
 
-                    {task.assigned_to && (
-                      <span className="task-author">
-                        Assigned to {task.assigned_to}
+                      {task.assigned_to && (
+                        <span className="task-author">
+                          Assigned to {task.assigned_to}
+                        </span>
+                      )}
+
+                      {(task.created_by || task.createdBy) && (
+                        <span className="task-author">
+                          Added by {task.created_by || task.createdBy}
+                        </span>
+                      )}
+
+                      <span className="task-planning-meta">
+                        <span
+                          className={`task-priority-badge priority-${taskPriority}`}
+                        >
+                          {taskPriority.charAt(0).toUpperCase() +
+                            taskPriority.slice(1)}
+                        </span>
+
+                        {task.due_date ? (
+                          <span
+                            className={`task-due-date${overdue ? ' overdue' : ''}`}
+                          >
+                            {overdue ? 'Overdue · ' : 'Due · '}
+                            {formatDueDate(task.due_date)}
+                          </span>
+                        ) : (
+                          <span className="task-no-due-date">
+                            No due date
+                          </span>
+                        )}
                       </span>
-                    )}
-
-                    {task.created_by && (
-                      <span className="task-author">
-                        Added by {task.created_by}
-                      </span>
-                    )}
-                  </span>
-
-                </button>
-              ))
+                    </span>
+                  </button>
+                )
+              })
             )}
           </div>
+
           {filteredOpenTasks.length > visibleOpenCount && (
             <button
               type="button"
               className="completed-toggle"
-              onClick={() =>
-                setVisibleOpenCount((count) => count + 10)
-              }
+              onClick={() => setVisibleOpenCount((count) => count + 10)}
             >
               Load 10 more
             </button>
           )}
         </section>
-
 
         {completedTasks.length > 0 && (
           <section className="task-section completed-section">
@@ -297,8 +405,22 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
                       <Icon name="check" size={15} />
                     </span>
 
-                    <span className="task-title">
-                      {task.title}
+                    <span className="task-details">
+                      <span className="task-title">{task.title}</span>
+                      <span className="task-planning-meta">
+                        <span
+                          className={`task-priority-badge priority-${task.priority || 'normal'}`}
+                        >
+                          {(task.priority || 'normal').charAt(0).toUpperCase() +
+                            (task.priority || 'normal').slice(1)}
+                        </span>
+
+                        {task.due_date && (
+                          <span className="task-due-date">
+                            Due · {formatDueDate(task.due_date)}
+                          </span>
+                        )}
+                      </span>
                     </span>
                   </button>
                 ))}
