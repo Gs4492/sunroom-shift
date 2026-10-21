@@ -361,6 +361,36 @@ function App() {
 
 
 
+  const updateTask = async (taskId, updatedTask) => {
+    const { data, error } = await supabase
+      .from('tasks')
+      .update({
+        title: updatedTask.title,
+        assigned_to: updatedTask.assignedTo,
+        priority: updatedTask.priority,
+        due_date: updatedTask.dueDate || null,
+      })
+      .eq('id', taskId)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating task:', error.message)
+      showSuccessMessage('Could not update task. Please try again.')
+      return false
+    }
+
+    setTasks((currentTasks) =>
+      currentTasks.map((task) => (task.id === taskId ? data : task))
+    )
+
+    showSuccessMessage('Task updated successfully!')
+    return true
+  }
+
+
+
+
   const toggleTask = async (taskId) => {
     const task = tasks.find((item) => item.id === taskId)
 
@@ -468,6 +498,7 @@ function App() {
           onBack={() => setScreen('home')}
           onAddTask={addTask}
           onToggleTask={toggleTask}
+          onUpdateTask={updateTask}
         />
       )
     }

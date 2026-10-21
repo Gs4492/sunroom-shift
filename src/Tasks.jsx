@@ -57,7 +57,7 @@ function isTaskOverdue(task) {
   )
 }
 
-function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
+function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
   const [newTask, setNewTask] = useState('')
   const [assignMode, setAssignMode] = useState('self')
   const [otherAssignee, setOtherAssignee] = useState('')
@@ -68,6 +68,13 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [visibleOpenCount, setVisibleOpenCount] = useState(10)
+
+  const [editingTask, setEditingTask] = useState(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editAssignee, setEditAssignee] = useState('')
+  const [editPriority, setEditPriority] = useState('normal')
+  const [editDueDate, setEditDueDate] = useState('')
+  const [savingEdit, setSavingEdit] = useState(false)
 
   const handleAddTask = () => {
     if (!newTask.trim() || !createdBy.trim()) {
@@ -100,6 +107,46 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
     setPriority('normal')
     setDueDate('')
   }
+
+
+  const handleStartEdit = (task) => {
+    setEditingTask(task)
+    setEditTitle(task.title || '')
+    setEditAssignee(task.assigned_to || '')
+    setEditPriority(task.priority || 'normal')
+    setEditDueDate(task.due_date || '')
+  }
+
+  const handleCancelEdit = () => {
+    setEditingTask(null)
+    setEditTitle('')
+    setEditAssignee('')
+    setEditPriority('normal')
+    setEditDueDate('')
+    setSavingEdit(false)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingTask || !editTitle.trim() || savingEdit) return
+
+    setSavingEdit(true)
+
+    try {
+      const saved = await onUpdateTask(editingTask.id, {
+        title: editTitle.trim(),
+        assignedTo: editAssignee.trim() || null,
+        priority: editPriority,
+        dueDate: editDueDate || null,
+      })
+
+      if (saved) {
+        handleCancelEdit()
+      }
+    } finally {
+      setSavingEdit(false)
+    }
+  }
+
 
   const handleToggleTask = (task) => {
     const action = task.completed ? 'reopen' : 'complete'
@@ -320,55 +367,131 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask }) {
                 const overdue = isTaskOverdue(task)
                 const taskPriority = task.priority || 'normal'
 
+
                 return (
-                  <button
-                    type="button"
-                    className={`task-card${overdue ? ' overdue' : ''}`}
+                  <div
+                    className={`task-card-wrapper${overdue ? ' overdue' : ''}`}
                     key={task.id}
-                    onClick={() => handleToggleTask(task)}
-                    aria-label={`Mark ${task.title} as completed`}
                   >
-                    <span className="task-checkbox" />
+                    {editingTask?.id === task.id ? (
+                      <div className="task-edit-form">
+                        <label>
+                          Task title
+                          <input
+                            type="text"
+                            value={editTitle}
+                            onChange={(event) => setEditTitle(event.target.value)}
+                            maxLength={200}
+                            autoFocus
+                          />
+                        </label>
 
-                    <span className="task-details">
-                      <span className="task-title">{task.title}</span>
+                        <label>
+                          Assigned to
+                          <input
+                            type="text"
+                            value={editAssignee}
+                            onChange={(event) => setEditAssignee(event.target.value)}
+                            placeholder="Leave blank for unassigned"
+                            maxLength={60}
+                          />
+                        </label>
 
-                      {task.assigned_to && (
-                        <span className="task-author">
-                          Assigned to {task.assigned_to}
-                        </span>
-                      )}
-
-                      {(task.created_by || task.createdBy) && (
-                        <span className="task-author">
-                          Added by {task.created_by || task.createdBy}
-                        </span>
-                      )}
-
-                      <span className="task-planning-meta">
-                        <span
-                          className={`task-priority-badge priority-${taskPriority}`}
-                        >
-                          {taskPriority.charAt(0).toUpperCase() +
-                            taskPriority.slice(1)}
-                        </span>
-
-                        {task.due_date ? (
-                          <span
-                            className={`task-due-date${overdue ? ' overdue' : ''}`}
+                        <label>
+                          Priority
+                          <select
+                            value={editPriority}
+                            onChange={(event) => setEditPriority(event.target.value)}
                           >
-                            {overdue ? 'Overdue · ' : 'Due · '}
-                            {formatDueDate(task.due_date)}
+                            <option value="urgent">Urgent</option>
+                            <option value="normal">Normal</option>
+                            <option value="low">Low</option>
+                          </select>
+                        </label>
+
+                        <label>
+                          Due date
+                          <input
+                            type="date"
+                            value={editDueDate}
+                            min={getTodayDate()}
+                            onChange={(event) => setEditDueDate(event.target.value)}
+                          />
+                        </label>
+
+                        <div className="task-edit-actions">
+                          <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            disabled={savingEdit}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleSaveEdit}
+                            disabled={!editTitle.trim() || savingEdit}
+                          >
+                            {savingEdit ? 'Saving...' : 'Save changes'}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          className={`task-card${overdue ? ' overdue' : ''}`}
+                          onClick={() => handleToggleTask(task)}
+                          aria-label={`Mark ${task.title} as completed`}
+                        >
+                          <span className="task-checkbox" />
+
+                          <span className="task-details">
+                            <span className="task-title">{task.title}</span>
+
+                            {task.assigned_to && (
+                              <span className="task-author">
+                                Assigned to {task.assigned_to}
+                              </span>
+                            )}
+
+                            {(task.created_by || task.createdBy) && (
+                              <span className="task-author">
+                                Added by {task.created_by || task.createdBy}
+                              </span>
+                            )}
+
+                            <span className="task-planning-meta">
+                              <span className={`task-priority-badge priority-${taskPriority}`}>
+                                {taskPriority.charAt(0).toUpperCase() +
+                                  taskPriority.slice(1)}
+                              </span>
+
+                              {task.due_date ? (
+                                <span className={`task-due-date${overdue ? ' overdue' : ''}`}>
+                                  {overdue ? 'Overdue · ' : 'Due · '}
+                                  {formatDueDate(task.due_date)}
+                                </span>
+                              ) : (
+                                <span className="task-no-due-date">No due date</span>
+                              )}
+                            </span>
                           </span>
-                        ) : (
-                          <span className="task-no-due-date">
-                            No due date
-                          </span>
-                        )}
-                      </span>
-                    </span>
-                  </button>
+                        </button>
+
+                        <button
+                          type="button"
+                          className="task-edit-button"
+                          onClick={() => handleStartEdit(task)}
+                          aria-label={`Edit ${task.title}`}
+                        >
+                          Edit
+                        </button>
+                      </>
+                    )}
+                  </div>
                 )
+
               })
             )}
           </div>
