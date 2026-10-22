@@ -22,6 +22,12 @@ function Icon({ name, size = 20 }) {
       </>
     ),
     check: <path d="m5 12 4 4L19 6" />,
+    edit: (
+      <>
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L9 17l-4 1 1-4Z" />
+      </>
+    ),
   }
 
   return <svg {...common}>{icons[name]}</svg>
@@ -39,8 +45,12 @@ function getTodayDate() {
 function formatDueDate(dateString) {
   if (!dateString) return ''
 
-  const [year, month, day] = dateString.split('-').map(Number)
+  const cleanDate = String(dateString).split('T')[0]
+  const [year, month, day] = cleanDate.split('-').map(Number)
+  if (!year || !month || !day) return ''
   const date = new Date(year, month - 1, day)
+
+  if (Number.isNaN(date.getTime())) return ''
 
   return date.toLocaleDateString('en-US', {
     month: 'short',
@@ -166,7 +176,13 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
   }
 
   const openTasks = tasks.filter((task) => !task.completed)
-  const completedTasks = tasks.filter((task) => task.completed)
+  const completedTasks = tasks
+    .filter((task) => task.completed)
+    .sort((a, b) => {
+      const timeA = new Date(a.completed_at || a.created_at || 0).getTime()
+      const timeB = new Date(b.completed_at || b.created_at || 0).getTime()
+      return timeB - timeA
+    })
   const overdueTasks = openTasks.filter(isTaskOverdue)
 
   const filteredOpenTasks = openTasks.filter((task) => {
@@ -183,13 +199,15 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
     const author = (task.created_by || task.createdBy || '').toLowerCase()
     const assignee = (task.assigned_to || task.assignedTo || '').toLowerCase()
     const taskDueDate = (task.due_date || '').toLowerCase()
+    const formattedDueDate = formatDueDate(task.due_date).toLowerCase()
 
     return (
       title.includes(query) ||
       author.includes(query) ||
       assignee.includes(query) ||
       taskPriority.includes(query) ||
-      taskDueDate.includes(query)
+      taskDueDate.includes(query) ||
+      formattedDueDate.includes(query)
     )
   })
 
@@ -410,11 +428,22 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
                         </label>
 
                         <label>
-                          Due date
+                          <span className="task-edit-label-header">
+                            <span>Due date</span>
+                            {editDueDate && (
+                              <button
+                                type="button"
+                                className="task-edit-clear-date"
+                                onClick={() => setEditDueDate('')}
+                              >
+                                Clear
+                              </button>
+                            )}
+                          </span>
                           <input
                             type="date"
                             value={editDueDate}
-                            min={getTodayDate()}
+                            min={editDueDate && editDueDate < getTodayDate() ? editDueDate : getTodayDate()}
                             onChange={(event) => setEditDueDate(event.target.value)}
                           />
                         </label>
@@ -479,14 +508,17 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
                           </span>
                         </button>
 
-                        <button
-                          type="button"
-                          className="task-edit-button"
-                          onClick={() => handleStartEdit(task)}
-                          aria-label={`Edit ${task.title}`}
-                        >
-                          Edit
-                        </button>
+                        <div className="task-card-actions">
+                          <button
+                            type="button"
+                            className="task-edit-button"
+                            onClick={() => handleStartEdit(task)}
+                            aria-label={`Edit ${task.title}`}
+                          >
+                            <Icon name="edit" size={14} />
+                            <span>Edit</span>
+                          </button>
+                        </div>
                       </>
                     )}
                   </div>
