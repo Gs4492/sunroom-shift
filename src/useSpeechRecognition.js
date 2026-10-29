@@ -14,6 +14,7 @@ function useSpeechRecognition() {
       window.webkitSpeechRecognition
 
     if (!SpeechRecognition) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError(
         'Speech recognition is not supported in this browser.'
       )
@@ -115,7 +116,7 @@ function useSpeechRecognition() {
 
     try {
       recognitionRef.current.start()
-    } catch (error) {
+    } catch {
       isStartingRef.current = false
       setIsListening(false)
       setError('Could not start the microphone.')
