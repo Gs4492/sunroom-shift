@@ -44,6 +44,10 @@ function Handoff({
     editingHandoff?.note || ''
   )
 
+  const [recipient, setRecipient] = useState(
+    editingHandoff?.recipient || ''
+  )
+
   const [categoryManuallySelected, setCategoryManuallySelected] =
     useState(false)
 
@@ -73,14 +77,16 @@ function Handoff({
 
   const originalNote = editingHandoff?.note || ''
   const originalCategory = editingHandoff?.category || 'General'
+  const originalRecipient = editingHandoff?.recipient || ''
   const originalCreatedBy =
     editingHandoff?.createdBy || editingHandoff?.created_by || ''
 
   const hasUnsavedChanges = editingHandoff
     ? note.trim() !== originalNote.trim() ||
       category !== originalCategory ||
+      recipient.trim() !== originalRecipient.trim() ||
       createdBy.trim() !== originalCreatedBy.trim()
-    : note.trim().length > 0 || createdBy.trim().length > 0
+    : note.trim().length > 0 || recipient.trim().length > 0 || createdBy.trim().length > 0
 
   useEffect(() => {
     if (!transcript.trim()) return
@@ -127,6 +133,7 @@ function Handoff({
     const savedHandoff = {
       id: editingHandoff?.id ?? Date.now(),
       category,
+      recipient: recipient.trim(),
       createdBy: createdBy.trim(),
       note: note.trim(),
       createdAt:
@@ -221,6 +228,19 @@ function Handoff({
             }}
             placeholder="Example: We're running low on potting soil..."
             rows="6"
+          />
+        </section>
+
+        <section className="recipient-section">
+          <label htmlFor="handoff-recipient">For (optional)</label>
+          <input
+            id="handoff-recipient"
+            type="text"
+            value={recipient}
+            onChange={(event) => setRecipient(event.target.value)}
+            placeholder="e.g. Parul"
+            autoComplete="off"
+            maxLength={60}
           />
         </section>
 
