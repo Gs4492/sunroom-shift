@@ -192,6 +192,9 @@ function HandoffHistory({
 
                 <p>{handoff.note}</p>
 
+                {handoff.recipient && (
+                  <div className="history-recipient">For {handoff.recipient}</div>
+                )}
 
                 {handoff.created_by && (
                   <div className="history-author">

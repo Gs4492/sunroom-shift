@@ -250,6 +250,7 @@ function App() {
       .from('handoffs')
       .insert({
         category: newHandoff.category,
+        recipient: newHandoff.recipient || null,
         note: newHandoff.note,
         created_by: newHandoff.createdBy,
       })
@@ -283,6 +284,7 @@ function App() {
       .from('handoffs')
       .update({
         category: updatedHandoff.category,
+        recipient: updatedHandoff.recipient || null,
         note: updatedHandoff.note,
         created_by: updatedHandoff.createdBy,
       })
@@ -567,6 +569,9 @@ function App() {
                   </div>
 
                   <span className="attention-note">{handoff.note}</span>
+                  {handoff.recipient && (
+                    <span className="attention-recipient">For {handoff.recipient}</span>
+                  )}
                   {handoff.created_by && (
                     <span className="attention-author">
                       Added by {handoff.created_by}

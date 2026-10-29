@@ -953,6 +953,36 @@
 
 
 
+/* ---------- Handoff Recipient ---------- */
+
+.recipient-section {
+  margin-bottom: 24px;
+}
+
+.recipient-section label {
+  display: block;
+  margin-bottom: 9px;
+  color: #40364c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.recipient-section input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #e8e1f1;
+  border-radius: 14px;
+  outline: none;
+  background: #ffffff;
+  color: #352b40;
+  font-size: 13px;
+  box-shadow: 0 6px 20px rgba(80, 57, 105, 0.04);
+}
+
+.recipient-section input:focus {
+  border-color: #b9a0dc;
+}
+
 /* ---------- Note ---------- */
 
 
@@ -3409,6 +3439,15 @@ button:disabled {
   color: var(--muted);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
+}
+
+.attention-recipient,
+.history-recipient {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .attention-note {
