@@ -7,6 +7,12 @@ import Tasks from './Tasks'
 import { supabase } from './supabaseClient'
 import sunroomLogo from './assets/sunroom-plants-logo.png'
 import { enablePushNotifications } from './pushNotifications'
+import {
+  loadPhotosForHandoffs,
+  uploadHandoffPhotosWithRollback,
+  deleteHandoffPhotos,
+  cleanupAllPhotosForHandoff,
+} from './photoService'
 
 function Icon({ name, size = 20, strokeWidth = 1.8 }) {
   const common = {
@@ -74,6 +80,12 @@ function Icon({ name, size = 20, strokeWidth = 1.8 }) {
         <path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8" />
       </>
     ),
+    camera: (
+      <>
+        <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+        <circle cx="12" cy="13" r="3" />
+      </>
+    ),
     home: (
       <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z" />
     ),
@@ -100,8 +112,6 @@ function App() {
     Notification.permission === 'granted'
   )
 
-
-
   useEffect(() => {
     if (!successMessage) return
 
@@ -115,6 +125,7 @@ function App() {
   const showSuccessMessage = (message) => {
     setSuccessMessage(message)
   }
+
   const handleEnableNotifications = async () => {
     try {
       const message = await enablePushNotifications()
@@ -134,11 +145,12 @@ function App() {
   }
 
   const [handoffs, setHandoffs] = useState([])
-  const [handoffsLoading, setHandoffsLoading] = useState(true)
+  const [, setHandoffsLoading] = useState(true)
 
   const [tasks, setTasks] = useState([])
-  const [tasksLoading, setTasksLoading] = useState(true)
+  const [, setTasksLoading] = useState(true)
 
+  // Load handoffs and their associated photos
   useEffect(() => {
     const loadHandoffs = async () => {
       const { data, error } = await supabase
@@ -152,11 +164,15 @@ function App() {
         return
       }
 
+      const handoffIds = (data || []).map((h) => h.id)
+      const photosByHandoff = await loadPhotosForHandoffs(handoffIds)
+
       setHandoffs(
-        data.map((handoff) => ({
+        (data || []).map((handoff) => ({
           ...handoff,
           createdAt: handoff.created_at,
           createdBy: handoff.created_by,
+          photos: photosByHandoff[handoff.id] || [],
         }))
       )
 
@@ -179,13 +195,14 @@ function App() {
         return
       }
 
-      setTasks(data)
+      setTasks(data || [])
       setTasksLoading(false)
     }
 
     loadTasks()
   }, [])
 
+  // Realtime subscriptions for live handoffs and tasks updates
   useEffect(() => {
     const channel = supabase
       .channel('sunroom-shift-live')
@@ -207,11 +224,15 @@ function App() {
             return
           }
 
+          const handoffIds = (data || []).map((h) => h.id)
+          const photosByHandoff = await loadPhotosForHandoffs(handoffIds)
+
           setHandoffs(
-            data.map((handoff) => ({
+            (data || []).map((handoff) => ({
               ...handoff,
               createdAt: handoff.created_at,
               createdBy: handoff.created_by,
+              photos: photosByHandoff[handoff.id] || [],
             }))
           )
         }
@@ -234,7 +255,7 @@ function App() {
             return
           }
 
-          setTasks(data)
+          setTasks(data || [])
         }
       )
       .subscribe()
@@ -244,8 +265,8 @@ function App() {
     }
   }, [])
 
-
   const addHandoff = async (newHandoff) => {
+    // 1. Insert core handoff record
     const { data, error } = await supabase
       .from('handoffs')
       .insert({
@@ -260,13 +281,50 @@ function App() {
     if (error) {
       console.error('Error saving handoff:', error.message)
       showSuccessMessage('Could not save handoff. Please try again.')
-      return
+      return false
+    }
+
+    let uploadedPhotos = []
+
+    // 2. Upload attached photos if present
+    if (newHandoff.newPhotos && newHandoff.newPhotos.length > 0) {
+      try {
+        uploadedPhotos = await uploadHandoffPhotosWithRollback(
+          data.id,
+          newHandoff.newPhotos
+        )
+      } catch (photoErr) {
+        console.error('Photo upload failed for new handoff:', photoErr)
+
+        // Clean up the created handoff record so state is not partially committed
+        let cleanupWarning = ''
+        try {
+          const { error: cleanupError } = await supabase
+            .from('handoffs')
+            .delete()
+            .eq('id', data.id)
+
+          if (cleanupError) {
+            console.error('Handoff rollback cleanup failed:', cleanupError.message)
+            cleanupWarning = ` (Warning: cleanup of incomplete handoff record failed: ${cleanupError.message})`
+          }
+        } catch (cleanupEx) {
+          console.error('Handoff rollback cleanup exception:', cleanupEx)
+          cleanupWarning = ` (Warning: cleanup of incomplete handoff record failed: ${cleanupEx.message || 'database error'})`
+        }
+
+        showSuccessMessage(
+          `Could not upload photos (${photoErr.message || 'Storage error'}). Handoff was not saved.${cleanupWarning}`
+        )
+        return false
+      }
     }
 
     const savedHandoff = {
       ...data,
       createdAt: data.created_at,
       createdBy: data.created_by,
+      photos: uploadedPhotos,
     }
 
     setHandoffs((currentHandoffs) => [
@@ -277,9 +335,11 @@ function App() {
     setEditingHandoff(null)
     showSuccessMessage('Handoff saved successfully!')
     setScreen('home')
+    return true
   }
 
   const updateHandoff = async (updatedHandoff) => {
+    // 1. Update handoff core fields
     const { data, error } = await supabase
       .from('handoffs')
       .update({
@@ -295,13 +355,51 @@ function App() {
     if (error) {
       console.error('Error updating handoff:', error.message)
       showSuccessMessage('Could not update handoff. Please try again.')
-      return
+      return false
     }
+
+    // 2. Remove any deleted photos from storage and DB
+    const removedPhotosList =
+      updatedHandoff.removedPhotos ||
+      (updatedHandoff.removedPhotoIds
+        ? (handoffs.find((h) => h.id === updatedHandoff.id)?.photos || []).filter((p) =>
+            updatedHandoff.removedPhotoIds.includes(p.id)
+          )
+        : [])
+
+    if (removedPhotosList.length > 0) {
+      await deleteHandoffPhotos(removedPhotosList)
+    }
+
+    // 3. Upload any newly added photos
+    let newUploadedPhotos = []
+    if (updatedHandoff.newPhotos && updatedHandoff.newPhotos.length > 0) {
+      try {
+        newUploadedPhotos = await uploadHandoffPhotosWithRollback(
+          updatedHandoff.id,
+          updatedHandoff.newPhotos
+        )
+      } catch (photoErr) {
+        console.error('Photo upload failed during handoff edit:', photoErr)
+        showSuccessMessage(
+          `Photo upload failed: ${photoErr.message || 'Storage error'}.`
+        )
+        return false
+      }
+    }
+
+    // 4. Combine remaining existing photos with new photos
+    const removedIds = removedPhotosList.map((p) => p.id)
+    const remainingPhotos = (updatedHandoff.existingPhotos || []).filter(
+      (p) => !removedIds.includes(p.id)
+    )
+    const combinedPhotos = [...remainingPhotos, ...newUploadedPhotos]
 
     const savedHandoff = {
       ...data,
       createdAt: data.created_at,
       createdBy: data.created_by,
+      photos: combinedPhotos,
     }
 
     setHandoffs((currentHandoffs) =>
@@ -314,9 +412,15 @@ function App() {
     setHistoryCategory('All')
     showSuccessMessage('Handoff updated successfully!')
     setScreen('history')
+    return true
   }
 
   const deleteHandoff = async (handoffId) => {
+    // 1. Clean up associated Storage files first
+    const handoffToDelete = handoffs.find((h) => h.id === handoffId)
+    await cleanupAllPhotosForHandoff(handoffId, handoffToDelete?.photos)
+
+    // 2. Delete handoff record from DB (triggers Postgres ON DELETE CASCADE)
     const { error } = await supabase
       .from('handoffs')
       .delete()
@@ -325,7 +429,7 @@ function App() {
     if (error) {
       console.error('Error deleting handoff:', error.message)
       showSuccessMessage('Could not delete handoff. Please try again.')
-      return
+      return false
     }
 
     setHandoffs((currentHandoffs) =>
@@ -333,9 +437,8 @@ function App() {
     )
 
     showSuccessMessage('Handoff deleted successfully!')
+    return true
   }
-
-
 
   const addTask = async (newTask) => {
     const { data, error } = await supabase
@@ -360,8 +463,6 @@ function App() {
     setTasks((currentTasks) => [data, ...currentTasks])
     showSuccessMessage('Task added successfully!')
   }
-
-
 
   const updateTask = async (taskId, updatedTask) => {
     const { data, error } = await supabase
@@ -389,9 +490,6 @@ function App() {
     showSuccessMessage('Task updated successfully!')
     return true
   }
-
-
-
 
   const toggleTask = async (taskId) => {
     const task = tasks.find((item) => item.id === taskId)
@@ -424,7 +522,6 @@ function App() {
       )
     )
   }
-
 
   const openHistory = (category = 'All') => {
     setHistoryCategory(category)
@@ -546,7 +643,6 @@ function App() {
               : `${handoffs.length} shift notes`}
           </h2>
 
-
           <div className="attention-list">
             {handoffs.slice(0, 2).map((handoff) => (
               <div className="attention-item" key={handoff.id}>
@@ -569,19 +665,29 @@ function App() {
                   </div>
 
                   <span className="attention-note">{handoff.note}</span>
-                  {handoff.recipient && (
-                    <span className="attention-recipient">For {handoff.recipient}</span>
-                  )}
-                  {handoff.created_by && (
-                    <span className="attention-author">
-                      Added by {handoff.created_by}
-                    </span>
-                  )}
+
+                  <div className="attention-extra-info">
+                    {handoff.photos && handoff.photos.length > 0 && (
+                      <span className="attention-photo-badge" aria-label={`${handoff.photos.length} photo attached`}>
+                        <Icon name="camera" size={13} />
+                        <span>{handoff.photos.length}</span>
+                      </span>
+                    )}
+
+                    {handoff.recipient && (
+                      <span className="attention-recipient">For {handoff.recipient}</span>
+                    )}
+
+                    {handoff.created_by && (
+                      <span className="attention-author">
+                        Added by {handoff.created_by}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-
 
           <button
             className="text-button"

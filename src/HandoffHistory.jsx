@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 function Icon({ name, size = 20 }) {
   const common = {
@@ -44,9 +44,27 @@ function Icon({ name, size = 20 }) {
         <path d="M14 11v5" />
       </>
     ),
+    close: (
+      <>
+        <path d="M18 6 6 18M6 6l12 12" />
+      </>
+    ),
+    image: (
+      <>
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <path d="m21 15-5-5L5 21" />
+      </>
+    ),
+    zoomIn: (
+      <>
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3M11 8v6M8 11h6" />
+      </>
+    ),
   }
 
-  return <svg {...common}>{icons[name]}</svg>
+  return <svg {...common}>{icons[name] || icons.notes}</svg>
 }
 
 function HandoffHistory({
@@ -61,6 +79,12 @@ function HandoffHistory({
 
   const [handoffToDelete, setHandoffToDelete] =
     useState(null)
+
+  // Active photo for the lightbox enlargement modal
+  const [activePhotoModal, setActivePhotoModal] = useState(null)
+
+  // Track image load errors by photo ID
+  const [failedPhotoIds, setFailedPhotoIds] = useState({})
 
   const categories = [
     'All',
@@ -96,13 +120,33 @@ function HandoffHistory({
       )
 
   const confirmDelete = () => {
-    if (!handoffToDelete) {
-      return
-    }
-
+    if (!handoffToDelete) return
     onDelete(handoffToDelete.id)
     setHandoffToDelete(null)
   }
+
+  const handleImageError = (photoId) => {
+    setFailedPhotoIds((prev) => ({ ...prev, [photoId]: true }))
+  }
+
+  // Handle ESC key to close enlarged photo modal
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Escape') {
+        if (activePhotoModal) {
+          setActivePhotoModal(null)
+        } else if (handoffToDelete) {
+          setHandoffToDelete(null)
+        }
+      }
+    },
+    [activePhotoModal, handoffToDelete]
+  )
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
 
   return (
     <div className="handoff-history-screen">
@@ -173,61 +217,167 @@ function HandoffHistory({
               </p>
             </div>
           ) : (
-            filteredHandoffs.map((handoff) => (
-              <article
-                className="history-card"
-                key={handoff.id}
-              >
-                <div className="history-card-top">
-                  <span className="history-category">
-                    {handoff.category}
-                  </span>
+            filteredHandoffs.map((handoff) => {
+              const photos = handoff.photos || []
 
-                  <span className="history-time">
-                    {handoff.createdAt
-                      ? formatDateTime(handoff.createdAt)
-                      : 'Earlier'}
-                  </span>
-                </div>
+              return (
+                <article
+                  className="history-card"
+                  key={handoff.id}
+                >
+                  <div className="history-card-top">
+                    <span className="history-category">
+                      {handoff.category}
+                    </span>
 
-                <p>{handoff.note}</p>
-
-                {handoff.recipient && (
-                  <div className="history-recipient">For {handoff.recipient}</div>
-                )}
-
-                {handoff.created_by && (
-                  <div className="history-author">
-                    Added by {handoff.created_by}
+                    <span className="history-time">
+                      {handoff.createdAt
+                        ? formatDateTime(handoff.createdAt)
+                        : 'Earlier'}
+                    </span>
                   </div>
-                )}
 
+                  <p className="history-note-text">{handoff.note}</p>
 
-                <div className="handoff-card-actions">
-                  <button
-                    type="button"
-                    className="edit-handoff-button"
-                    onClick={() => onEdit(handoff)}
-                  >
-                    <Icon name="edit" size={16} />
-                    <span>Edit note</span>
-                  </button>
+                  {/* Attached photo thumbnails */}
+                  {photos.length > 0 && (
+                    <div
+                      className={`history-photos-grid count-${photos.length}`}
+                      aria-label="Attached photos"
+                    >
+                      {photos.map((photo, index) => {
+                        const isFailed = failedPhotoIds[photo.id] || !photo.signedUrl
 
-                  <button
-                    type="button"
-                    className="delete-handoff-button"
-                    onClick={() => setHandoffToDelete(handoff)}
-                  >
-                    <Icon name="trash" size={16} />
-                    <span>Delete note</span>
-                  </button>
-                </div>
-              </article>
-            ))
+                        return (
+                          <div
+                            className="history-photo-wrapper"
+                            key={photo.id || `photo-${index}`}
+                          >
+                            {isFailed ? (
+                              <div
+                                className="history-photo-fallback"
+                                role="note"
+                                aria-label="Photo could not be loaded"
+                              >
+                                <Icon name="image" size={24} />
+                                <span>Image unavailable</span>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                className="history-photo-thumb-button"
+                                onClick={() =>
+                                  setActivePhotoModal({
+                                    url: photo.signedUrl,
+                                    category: handoff.category,
+                                    note: handoff.note,
+                                    author: handoff.created_by,
+                                  })
+                                }
+                                aria-label={`View enlarged photo ${index + 1}`}
+                              >
+                                <img
+                                  src={photo.signedUrl}
+                                  alt={`Attachment ${index + 1} for ${handoff.category} handoff`}
+                                  className="history-photo-img"
+                                  loading="lazy"
+                                  onError={() => handleImageError(photo.id)}
+                                />
+                                <span className="photo-zoom-badge" aria-hidden="true">
+                                  <Icon name="zoomIn" size={14} />
+                                </span>
+                              </button>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  {handoff.recipient && (
+                    <div className="history-recipient">For {handoff.recipient}</div>
+                  )}
+
+                  {handoff.created_by && (
+                    <div className="history-author">
+                      Added by {handoff.created_by}
+                    </div>
+                  )}
+
+                  <div className="handoff-card-actions">
+                    <button
+                      type="button"
+                      className="edit-handoff-button"
+                      onClick={() => onEdit(handoff)}
+                    >
+                      <Icon name="edit" size={16} />
+                      <span>Edit note</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="delete-handoff-button"
+                      onClick={() => setHandoffToDelete(handoff)}
+                    >
+                      <Icon name="trash" size={16} />
+                      <span>Delete note</span>
+                    </button>
+                  </div>
+                </article>
+              )
+            })
           )}
         </section>
       </main>
 
+      {/* Enlarged Photo Lightbox Modal */}
+      {activePhotoModal && (
+        <div
+          className="photo-lightbox-overlay"
+          onClick={() => setActivePhotoModal(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Enlarged photo preview"
+        >
+          <div
+            className="photo-lightbox-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="photo-lightbox-close"
+              onClick={() => setActivePhotoModal(null)}
+              aria-label="Close enlarged photo"
+            >
+              <Icon name="close" size={24} />
+            </button>
+
+            <div className="photo-lightbox-img-box">
+              <img
+                src={activePhotoModal.url}
+                alt="Enlarged handoff attachment"
+                className="photo-lightbox-img"
+              />
+            </div>
+
+            <div className="photo-lightbox-caption">
+              <span className="caption-category">
+                {activePhotoModal.category}
+              </span>
+              {activePhotoModal.author && (
+                <span className="caption-author">
+                  Added by {activePhotoModal.author}
+                </span>
+              )}
+              {activePhotoModal.note && (
+                <p className="caption-note">{activePhotoModal.note}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
       {handoffToDelete && (
         <div className="discard-overlay">
           <section
@@ -242,7 +392,7 @@ function HandoffHistory({
             </h2>
 
             <p id="delete-handoff-description">
-              This note will be permanently removed from this app.
+              This note and any attached photos will be permanently removed.
             </p>
 
             <div className="discard-actions">
