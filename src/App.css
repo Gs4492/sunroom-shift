@@ -967,7 +967,8 @@
   font-weight: 700;
 }
 
-.recipient-section input {
+.recipient-section input,
+.recipient-section select {
   width: 100%;
   padding: 14px 16px;
   border: 1px solid #e8e1f1;
@@ -979,7 +980,8 @@
   box-shadow: 0 6px 20px rgba(80, 57, 105, 0.04);
 }
 
-.recipient-section input:focus {
+.recipient-section input:focus,
+.recipient-section select:focus {
   border-color: #b9a0dc;
 }
 
@@ -3483,7 +3485,8 @@ button:disabled {
   font-weight: 600;
 }
 
-.created-by-section input {
+.created-by-section input,
+.created-by-section select {
   box-sizing: border-box;
   width: 100%;
   min-height: 48px;
@@ -3502,7 +3505,8 @@ button:disabled {
   color: var(--muted);
 }
 
-.created-by-section input:focus {
+.created-by-section input:focus,
+.created-by-section select:focus {
   border-color: var(--accent);
   box-shadow: var(--focus-ring);
 }

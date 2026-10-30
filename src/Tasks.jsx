@@ -1,6 +1,14 @@
 
 import { useState } from 'react'
 
+const EMPLOYEE_NAMES = ['Carla', 'Anoushka', 'Chloe', 'Medina', 'Parul', 'Nikhil', 'Geet']
+const OTHER_OPTION = '__other__'
+
+function getEmployeeSelection(value) {
+  if (!value) return ''
+  return EMPLOYEE_NAMES.includes(value) ? value : OTHER_OPTION
+}
+
 function Icon({ name, size = 20 }) {
   const common = {
     width: size,
@@ -69,9 +77,11 @@ function isTaskOverdue(task) {
 
 function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
   const [newTask, setNewTask] = useState('')
-  const [assignMode, setAssignMode] = useState('self')
+  const [assignMode, setAssignMode] = useState('none')
   const [otherAssignee, setOtherAssignee] = useState('')
-  const [createdBy, setCreatedBy] = useState('')
+  const [createdBySelection, setCreatedBySelection] = useState('')
+  const [manualCreatedBy, setManualCreatedBy] = useState('')
+  const createdBy = createdBySelection === OTHER_OPTION ? manualCreatedBy : createdBySelection
   const [priority, setPriority] = useState('normal')
   const [dueDate, setDueDate] = useState('')
   const [showAllCompleted, setShowAllCompleted] = useState(false)
@@ -81,7 +91,9 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
 
   const [editingTask, setEditingTask] = useState(null)
   const [editTitle, setEditTitle] = useState('')
-  const [editAssignee, setEditAssignee] = useState('')
+  const [editAssigneeSelection, setEditAssigneeSelection] = useState('')
+  const [manualEditAssignee, setManualEditAssignee] = useState('')
+  const editAssignee = editAssigneeSelection === OTHER_OPTION ? manualEditAssignee : editAssigneeSelection
   const [editPriority, setEditPriority] = useState('normal')
   const [editDueDate, setEditDueDate] = useState('')
   const [savingEdit, setSavingEdit] = useState(false)
@@ -92,11 +104,11 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
     }
 
     const assignedTo =
-      assignMode === 'self'
-        ? createdBy.trim()
-        : assignMode === 'other'
-          ? otherAssignee.trim()
-          : null
+      assignMode === 'other'
+        ? otherAssignee.trim()
+        : assignMode === 'none'
+          ? null
+          : assignMode
 
     if (assignMode === 'other' && !otherAssignee.trim()) {
       return
@@ -111,9 +123,10 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
     })
 
     setNewTask('')
-    setCreatedBy('')
+    setCreatedBySelection('')
+    setManualCreatedBy('')
     setOtherAssignee('')
-    setAssignMode('self')
+    setAssignMode('none')
     setPriority('normal')
     setDueDate('')
   }
@@ -122,7 +135,9 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
   const handleStartEdit = (task) => {
     setEditingTask(task)
     setEditTitle(task.title || '')
-    setEditAssignee(task.assigned_to || '')
+    const currentAssignee = task.assigned_to || ''
+    setEditAssigneeSelection(getEmployeeSelection(currentAssignee))
+    setManualEditAssignee(getEmployeeSelection(currentAssignee) === OTHER_OPTION ? currentAssignee : '')
     setEditPriority(task.priority || 'normal')
     setEditDueDate(task.due_date || '')
   }
@@ -130,7 +145,8 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
   const handleCancelEdit = () => {
     setEditingTask(null)
     setEditTitle('')
-    setEditAssignee('')
+    setEditAssigneeSelection('')
+    setManualEditAssignee('')
     setEditPriority('normal')
     setEditDueDate('')
     setSavingEdit(false)
@@ -253,14 +269,28 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
             aria-label="New task"
           />
 
-          <input
-            type="text"
-            value={createdBy}
-            onChange={(event) => setCreatedBy(event.target.value)}
-            placeholder="Your name"
-            aria-label="Your name"
-            maxLength={60}
-          />
+          <div className="task-assignment">
+            <label htmlFor="taskCreatedBy">Your name</label>
+            <select
+              id="taskCreatedBy"
+              value={createdBySelection}
+              onChange={(event) => setCreatedBySelection(event.target.value)}
+            >
+              <option value="">Select your name</option>
+              {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
+              <option value={OTHER_OPTION}>Other (enter name)</option>
+            </select>
+            {createdBySelection === OTHER_OPTION && (
+              <input
+                type="text"
+                value={manualCreatedBy}
+                onChange={(event) => setManualCreatedBy(event.target.value)}
+                placeholder="Enter your name"
+                aria-label="Your name"
+                maxLength={60}
+              />
+            )}
+          </div>
 
           <div className="task-assignment">
             <label htmlFor="assignMode">Assign to</label>
@@ -270,9 +300,9 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
               value={assignMode}
               onChange={(event) => setAssignMode(event.target.value)}
             >
-              <option value="self">Myself</option>
-              <option value="other">Someone else</option>
               <option value="none">Unassigned</option>
+              {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
+              <option value="other">Other (enter name)</option>
             </select>
 
             {assignMode === 'other' && (
@@ -406,13 +436,24 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
 
                         <label>
                           Assigned to
-                          <input
-                            type="text"
-                            value={editAssignee}
-                            onChange={(event) => setEditAssignee(event.target.value)}
-                            placeholder="Leave blank for unassigned"
-                            maxLength={60}
-                          />
+                          <select
+                            value={editAssigneeSelection}
+                            onChange={(event) => setEditAssigneeSelection(event.target.value)}
+                            aria-label="Assigned to"
+                          >
+                            <option value="">Unassigned</option>
+                            {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
+                            <option value={OTHER_OPTION}>Other (enter name)</option>
+                          </select>
+                          {editAssigneeSelection === OTHER_OPTION && (
+                            <input
+                              type="text"
+                              value={manualEditAssignee}
+                              onChange={(event) => setManualEditAssignee(event.target.value)}
+                              placeholder="Enter assignee's name"
+                              maxLength={60}
+                            />
+                          )}
                         </label>
 
                         <label>
