@@ -77,7 +77,7 @@ function isTaskOverdue(task) {
 
 function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
   const [newTask, setNewTask] = useState('')
-  const [assignMode, setAssignMode] = useState('self')
+  const [assignMode, setAssignMode] = useState('none')
   const [otherAssignee, setOtherAssignee] = useState('')
   const [createdBySelection, setCreatedBySelection] = useState('')
   const [manualCreatedBy, setManualCreatedBy] = useState('')
@@ -104,13 +104,11 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
     }
 
     const assignedTo =
-      assignMode === 'self'
-        ? createdBy.trim()
-        : assignMode === 'other'
-          ? otherAssignee.trim()
-          : assignMode === 'none'
-            ? null
-            : assignMode
+      assignMode === 'other'
+        ? otherAssignee.trim()
+        : assignMode === 'none'
+          ? null
+          : assignMode
 
     if (assignMode === 'other' && !otherAssignee.trim()) {
       return
@@ -128,7 +126,7 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
     setCreatedBySelection('')
     setManualCreatedBy('')
     setOtherAssignee('')
-    setAssignMode('self')
+    setAssignMode('none')
     setPriority('normal')
     setDueDate('')
   }
@@ -302,10 +300,9 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
               value={assignMode}
               onChange={(event) => setAssignMode(event.target.value)}
             >
-              <option value="self">Myself</option>
+              <option value="none">Unassigned</option>
               {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
               <option value="other">Other (enter name)</option>
-              <option value="none">Unassigned</option>
             </select>
 
             {assignMode === 'other' && (
