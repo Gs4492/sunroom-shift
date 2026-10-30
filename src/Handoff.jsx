@@ -52,6 +52,13 @@ function Icon({ name, size = 22, strokeWidth = 1.8 }) {
   return <svg {...common}>{paths[name]}</svg>
 }
 
+const EMPLOYEE_NAMES = ['Carla', 'Anoushka', 'Chloe', 'Medina', 'Parul', 'Nikhil', 'Geet']
+const OTHER_OPTION = '__other__'
+
+function getEmployeeSelection(value) {
+  return EMPLOYEE_NAMES.includes(value) ? value : value ? OTHER_OPTION : ''
+}
+
 function Handoff({
   onBack,
   onSave,
@@ -65,13 +72,24 @@ function Handoff({
     editingHandoff?.note || ''
   )
 
-  const [recipient, setRecipient] = useState(
-    editingHandoff?.recipient || ''
+  const initialRecipient = editingHandoff?.recipient || ''
+  const initialCreatedBy = editingHandoff?.createdBy || editingHandoff?.created_by || ''
+
+  const [recipientSelection, setRecipientSelection] = useState(
+    getEmployeeSelection(initialRecipient)
+  )
+  const [manualRecipient, setManualRecipient] = useState(
+    getEmployeeSelection(initialRecipient) === OTHER_OPTION ? initialRecipient : ''
+  )
+  const [createdBySelection, setCreatedBySelection] = useState(
+    getEmployeeSelection(initialCreatedBy)
+  )
+  const [manualCreatedBy, setManualCreatedBy] = useState(
+    getEmployeeSelection(initialCreatedBy) === OTHER_OPTION ? initialCreatedBy : ''
   )
 
-  const [createdBy, setCreatedBy] = useState(
-    editingHandoff?.createdBy || editingHandoff?.created_by || ''
-  )
+  const recipient = recipientSelection === OTHER_OPTION ? manualRecipient : recipientSelection
+  const createdBy = createdBySelection === OTHER_OPTION ? manualCreatedBy : createdBySelection
 
   const [categoryManuallySelected, setCategoryManuallySelected] =
     useState(false)
@@ -400,32 +418,56 @@ function Handoff({
 
         <section className="recipient-section">
           <label htmlFor="handoff-recipient">For (optional)</label>
-          <input
+          <select
             id="handoff-recipient"
-            type="text"
-            value={recipient}
+            value={recipientSelection}
             disabled={isSaving}
-            onChange={(event) => setRecipient(event.target.value)}
-            placeholder="e.g. Parul"
-            autoComplete="off"
-            maxLength={60}
-          />
+            onChange={(event) => setRecipientSelection(event.target.value)}
+          >
+            <option value="">Select an employee</option>
+            {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
+            <option value={OTHER_OPTION}>Other (enter name)</option>
+          </select>
+          {recipientSelection === OTHER_OPTION && (
+            <input
+              id="handoff-recipient-other"
+              type="text"
+              value={manualRecipient}
+              disabled={isSaving}
+              onChange={(event) => setManualRecipient(event.target.value)}
+              placeholder="Enter recipient name"
+              autoComplete="off"
+              maxLength={60}
+            />
+          )}
         </section>
 
         <section className="created-by-section">
           <label htmlFor="handoff-created-by">Your name</label>
-
-          <input
+          <select
             id="handoff-created-by"
-            type="text"
-            value={createdBy}
+            value={createdBySelection}
             disabled={isSaving}
-            onChange={(event) => setCreatedBy(event.target.value)}
-            placeholder="Enter your name"
-            autoComplete="name"
-            maxLength={60}
+            onChange={(event) => setCreatedBySelection(event.target.value)}
             required
-          />
+          >
+            <option value="">Select your name</option>
+            {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
+            <option value={OTHER_OPTION}>Other (enter name)</option>
+          </select>
+          {createdBySelection === OTHER_OPTION && (
+            <input
+              id="handoff-created-by-other"
+              type="text"
+              value={manualCreatedBy}
+              disabled={isSaving}
+              onChange={(event) => setManualCreatedBy(event.target.value)}
+              placeholder="Enter your name"
+              autoComplete="name"
+              maxLength={60}
+              required
+            />
+          )}
         </section>
 
         <section className="handoff-photos-section">
