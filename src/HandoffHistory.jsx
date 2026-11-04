@@ -226,7 +226,7 @@ function HandoffHistory({
                   key={handoff.id}
                 >
                   <div className="history-card-top">
-                    <span className="history-category">
+                    <span className={`history-category cat-${(handoff.category || 'general').toLowerCase().replace(/\s+/g, '-')}`}>
                       {handoff.category}
                     </span>
 

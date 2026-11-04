@@ -345,6 +345,7 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
 
           <button
             type="button"
+            className="add-task-submit-button"
             onClick={handleAddTask}
             disabled={
               !newTask.trim() ||
