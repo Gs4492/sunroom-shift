@@ -7,7 +7,6 @@ import {
   isHeicFile,
   MAX_PHOTOS_PER_HANDOFF,
 } from './photoService'
-import EmployeeSelect from './EmployeeSelect'
 
 function Icon({ name, size = 22, strokeWidth = 1.8 }) {
   const common = {
@@ -419,15 +418,16 @@ function Handoff({
 
         <section className="recipient-section">
           <label htmlFor="handoff-recipient">For (optional)</label>
-          <EmployeeSelect
+          <select
             id="handoff-recipient"
             value={recipientSelection}
             disabled={isSaving}
             onChange={(event) => setRecipientSelection(event.target.value)}
-            placeholder="Select an employee"
-            otherValue={OTHER_OPTION}
-            ariaLabel="For (optional)"
-          />
+          >
+            <option value="">Select an employee</option>
+            {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
+            <option value={OTHER_OPTION}>Other (enter name)</option>
+          </select>
           {recipientSelection === OTHER_OPTION && (
             <input
               id="handoff-recipient-other"
@@ -444,16 +444,17 @@ function Handoff({
 
         <section className="created-by-section">
           <label htmlFor="handoff-created-by">Your name</label>
-          <EmployeeSelect
+          <select
             id="handoff-created-by"
             value={createdBySelection}
             disabled={isSaving}
             onChange={(event) => setCreatedBySelection(event.target.value)}
-            placeholder="Select your name"
             required
-            otherValue={OTHER_OPTION}
-            ariaLabel="Your name"
-          />
+          >
+            <option value="">Select your name</option>
+            {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
+            <option value={OTHER_OPTION}>Other (enter name)</option>
+          </select>
           {createdBySelection === OTHER_OPTION && (
             <input
               id="handoff-created-by-other"

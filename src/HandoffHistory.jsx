@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getEmployeeAvatar } from './employeeUtils'
 
 function Icon({ name, size = 20 }) {
   const common = {
@@ -227,7 +226,7 @@ function HandoffHistory({
                   key={handoff.id}
                 >
                   <div className="history-card-top">
-                    <span className={`history-category cat-${(handoff.category || 'general').toLowerCase().replace(/\s+/g, '-')}`}>
+                    <span className="history-category">
                       {handoff.category}
                     </span>
 
@@ -296,27 +295,11 @@ function HandoffHistory({
                   )}
 
                   {handoff.recipient && (
-                    <div className="history-recipient">
-                      {getEmployeeAvatar(handoff.recipient) && (
-                        <img
-                          src={getEmployeeAvatar(handoff.recipient)}
-                          alt=""
-                          className="employee-inline-avatar"
-                        />
-                      )}
-                      For {handoff.recipient}
-                    </div>
+                    <div className="history-recipient">For {handoff.recipient}</div>
                   )}
 
                   {handoff.created_by && (
                     <div className="history-author">
-                      {getEmployeeAvatar(handoff.created_by) && (
-                        <img
-                          src={getEmployeeAvatar(handoff.created_by)}
-                          alt=""
-                          className="employee-inline-avatar"
-                        />
-                      )}
                       Added by {handoff.created_by}
                     </div>
                   )}
