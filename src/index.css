@@ -1,40 +1,99 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap');
 
 :root {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  color: #252b27;
-  background: #f7f6f1;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #14241a;
+  background-color: #f8f7f2;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Sunroom Plants-inspired palette */
-  --app-bg: #f7f6f1;
+  /* ---------- Sunroom Plants Botanical Palette ---------- */
+  --app-bg: #f8f7f2;
   --surface: #ffffff;
-  --surface-muted: #f1f2ec;
-  --ink: #252b27;
-  --ink-soft: #505950;
-  --muted: #777e76;
-  --line: #e5e6df;
-  --line-strong: #d4d8ce;
+  --surface-muted: #f2f6f2;
+  --surface-card: #ffffff;
+  --surface-elevated: #ffffff;
 
-  /* Keep orange as the primary action color */
-  --accent: #e97822;
-  --accent-hover: #cc6113;
-  --accent-soft: #fff0e4;
+  /* Translucent Glass Variants */
+  --glass-surface: rgba(255, 255, 255, 0.88);
+  --glass-surface-hover: rgba(255, 255, 255, 0.96);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-border-subtle: rgba(20, 36, 26, 0.08);
 
-  /* Restrained botanical accents */
-  --success: #526b52;
-  --success-soft: #e8eee4;
-  --danger: #b42318;
-  --danger-soft: #fff0ef;
+  /* Typography / Inks */
+  --ink: #14241a;
+  --ink-soft: #2c4233;
+  --muted: #596f60;
+  --muted-light: #8da093;
 
-  --radius-card: 18px;
+  /* Borders & Dividers */
+  --line: rgba(20, 36, 26, 0.08);
+  --line-strong: rgba(20, 36, 26, 0.16);
+  --line-soft: rgba(20, 36, 26, 0.04);
+  --card-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+  /* Primary Accent: Sunroom Warm Terracotta */
+  --accent: #de5d14;
+  --accent-hover: #c44f0d;
+  --accent-active: #ad4207;
+  --accent-soft: #fff3eb;
+  --accent-soft-hover: #ffe8d9;
+  --accent-glow: rgba(222, 93, 20, 0.24);
+  --focus-ring: 0 0 0 3px rgba(222, 93, 20, 0.24);
+
+  /* Botanical Accents */
+  --forest: #173824;
+  --forest-soft: #edf5f0;
+  --success: #237846;
+  --success-hover: #195c34;
+  --success-soft: #eaf6ee;
+  --success-border: #bce6cb;
+
+  /* Semantic Tones */
+  --danger: #c52718;
+  --danger-soft: #fdf2f1;
+  --danger-border: #f9c7c3;
+  --warning: #d97706;
+  --warning-soft: #fffbeb;
+  --warning-border: #fde68a;
+  --info: #0f766e;
+  --info-soft: #f0fdfa;
+
+  /* Category Signatures */
+  --cat-plant-care-bg: #eaf6ee;
+  --cat-plant-care-color: #1f6439;
+  --cat-customer-bg: #fffbeb;
+  --cat-customer-color: #b45309;
+  --cat-stock-bg: #fff3eb;
+  --cat-stock-color: #c7530c;
+  --cat-task-bg: #f0fdfa;
+  --cat-task-color: #0f766e;
+  --cat-workshop-bg: #f5f3ff;
+  --cat-workshop-color: #6d28d9;
+  --cat-general-bg: #f2f5f1;
+  --cat-general-color: #384d3f;
+
+  /* Layered Natural Shadows */
+  --shadow-xs: 0 1px 2px rgba(20, 36, 26, 0.04);
+  --shadow-sm: 0 2px 6px -1px rgba(20, 36, 26, 0.06), 0 1px 2px rgba(20, 36, 26, 0.03);
+  --shadow-md: 0 10px 24px -4px rgba(20, 36, 26, 0.08), 0 3px 8px -2px rgba(20, 36, 26, 0.03);
+  --shadow-lg: 0 18px 38px -6px rgba(20, 36, 26, 0.12), 0 6px 14px -3px rgba(20, 36, 26, 0.05);
+  --shadow-floating: 0 14px 34px -4px rgba(20, 36, 26, 0.14), 0 2px 6px rgba(20, 36, 26, 0.04);
+  --shadow-cta: 0 10px 28px -4px rgba(222, 93, 20, 0.36);
+
+  /* Radii */
+  --radius-card: 20px;
+  --radius-card-sm: 14px;
   --radius-control: 12px;
-}
+  --radius-pill: 9999px;
 
+  /* Transitions */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
 
 * {
   box-sizing: border-box;
@@ -52,15 +111,22 @@ body {
   min-width: 320px;
   min-height: 100vh;
   min-height: 100dvh;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--app-bg);
   color: var(--ink);
+  background-image:
+    radial-gradient(40% 35% at 5% 5%, rgba(222, 93, 20, 0.05) 0%, transparent 100%),
+    radial-gradient(55% 45% at 90% 10%, rgba(35, 120, 70, 0.07) 0%, transparent 100%),
+    radial-gradient(90% 60% at 50% 0%, rgba(220, 238, 226, 0.45) 0%, rgba(248, 247, 242, 0.85) 60%, var(--app-bg) 100%);
+  background-attachment: fixed;
 }
 
 button,
 input,
+select,
 textarea {
   font: inherit;
+  color: inherit;
 }
 
 button {
@@ -69,32 +135,35 @@ button {
 
 button:focus-visible,
 input:focus-visible,
+select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid rgba(233, 120, 34, 0.28);
-  outline-offset: 3px;
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: var(--focus-ring) !important;
 }
 
-button:disabled {
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
   cursor: not-allowed;
 }
 
-#root {
-  min-height: 100vh;
-  min-height: 100dvh;
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-::selection {
-  background: #ffe0c7;
-  color: #25282d;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+::-webkit-scrollbar-thumb {
+  background: rgba(20, 36, 26, 0.16);
+  border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(20, 36, 26, 0.28);
 }

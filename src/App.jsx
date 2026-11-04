@@ -7,6 +7,7 @@ import Tasks from './Tasks'
 import { supabase } from './supabaseClient'
 import sunroomLogo from './assets/sunroom-plants-logo.png'
 import { enablePushNotifications } from './pushNotifications'
+import { getEmployeeAvatar } from './employeeUtils'
 import {
   loadPhotosForHandoffs,
   uploadHandoffPhotosWithRollback,
@@ -93,6 +94,23 @@ function Icon({ name, size = 20, strokeWidth = 1.8 }) {
       <>
         <path d="M9 6h11M9 12h11M9 18h11" />
         <path d="m3 6 1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2" />
+      </>
+    ),
+    bell: (
+      <>
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      </>
+    ),
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </>
+    ),
+    sparkles: (
+      <>
+      <path d="m12 3 1.9 4.8 4.8 1.9-4.8 1.9L12 16.5l-1.9-4.8L5.3 9.7l4.8-1.9L12 3Z" />
       </>
     ),
   }
@@ -610,12 +628,15 @@ function App() {
             alt="Sunroom Plants"
             className="welcome-logo"
           />
-          <p className="eyebrow">{formattedDate.toUpperCase()}</p>
+          <p className="eyebrow">
+            <Icon name="leaf" size={13} />
+            <span>{formattedDate.toUpperCase()}</span>
+          </p>
           <h1>Welcome to Sunroom Shift</h1>
           <p>Review shift handoffs and track shop tasks.</p>
 
           <button
-            className="notification-button"
+            className={`notification-button ${notificationsEnabled ? 'enabled' : ''}`}
             type="button"
             onClick={handleEnableNotifications}
             disabled={notificationsEnabled}
@@ -650,7 +671,7 @@ function App() {
 
                 <div className="attention-content">
                   <div className="attention-meta">
-                    <span className="attention-category">
+                    <span className={`attention-category cat-${(handoff.category || 'general').toLowerCase().replace(/\s+/g, '-')}`}>
                       {handoff.category || "General"}
                     </span>
 
@@ -675,11 +696,27 @@ function App() {
                     )}
 
                     {handoff.recipient && (
-                      <span className="attention-recipient">For {handoff.recipient}</span>
+                      <span className="attention-recipient">
+                        {getEmployeeAvatar(handoff.recipient) && (
+                          <img
+                            src={getEmployeeAvatar(handoff.recipient)}
+                            alt=""
+                            className="employee-inline-avatar"
+                          />
+                        )}
+                        For {handoff.recipient}
+                      </span>
                     )}
 
                     {handoff.created_by && (
                       <span className="attention-author">
+                        {getEmployeeAvatar(handoff.created_by) && (
+                          <img
+                            src={getEmployeeAvatar(handoff.created_by)}
+                            alt=""
+                            className="employee-inline-avatar"
+                          />
+                        )}
                         Added by {handoff.created_by}
                       </span>
                     )}

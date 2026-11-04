@@ -1,5 +1,7 @@
 
 import { useState } from 'react'
+import { getEmployeeAvatar } from './employeeUtils'
+import EmployeeSelect from './EmployeeSelect'
 
 const EMPLOYEE_NAMES = ['Carla', 'Anoushka', 'Chloe', 'Medina', 'Parul', 'Nikhil', 'Geet']
 const OTHER_OPTION = '__other__'
@@ -271,15 +273,15 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
 
           <div className="task-assignment">
             <label htmlFor="taskCreatedBy">Your name</label>
-            <select
+            <EmployeeSelect
               id="taskCreatedBy"
               value={createdBySelection}
               onChange={(event) => setCreatedBySelection(event.target.value)}
-            >
-              <option value="">Select your name</option>
-              {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
-              <option value={OTHER_OPTION}>Other (enter name)</option>
-            </select>
+              placeholder="Select your name"
+              required
+              otherValue={OTHER_OPTION}
+              ariaLabel="Your name"
+            />
             {createdBySelection === OTHER_OPTION && (
               <input
                 type="text"
@@ -294,16 +296,16 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
 
           <div className="task-assignment">
             <label htmlFor="assignMode">Assign to</label>
-
-            <select
+            <EmployeeSelect
               id="assignMode"
               value={assignMode}
               onChange={(event) => setAssignMode(event.target.value)}
-            >
-              <option value="none">Unassigned</option>
-              {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
-              <option value="other">Other (enter name)</option>
-            </select>
+              includeUnassigned
+              unassignedValue="none"
+              unassignedLabel="Unassigned"
+              otherValue="other"
+              ariaLabel="Assign to"
+            />
 
             {assignMode === 'other' && (
               <input
@@ -345,6 +347,7 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
 
           <button
             type="button"
+            className="add-task-submit-button"
             onClick={handleAddTask}
             disabled={
               !newTask.trim() ||
@@ -436,15 +439,15 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
 
                         <label>
                           Assigned to
-                          <select
+                          <EmployeeSelect
                             value={editAssigneeSelection}
                             onChange={(event) => setEditAssigneeSelection(event.target.value)}
-                            aria-label="Assigned to"
-                          >
-                            <option value="">Unassigned</option>
-                            {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
-                            <option value={OTHER_OPTION}>Other (enter name)</option>
-                          </select>
+                            includeUnassigned
+                            unassignedValue=""
+                            unassignedLabel="Unassigned"
+                            otherValue={OTHER_OPTION}
+                            ariaLabel="Assigned to"
+                          />
                           {editAssigneeSelection === OTHER_OPTION && (
                             <input
                               type="text"
@@ -521,12 +524,26 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
 
                             {task.assigned_to && (
                               <span className="task-author">
+                                {getEmployeeAvatar(task.assigned_to) && (
+                                  <img
+                                    src={getEmployeeAvatar(task.assigned_to)}
+                                    alt=""
+                                    className="employee-inline-avatar"
+                                  />
+                                )}
                                 Assigned to {task.assigned_to}
                               </span>
                             )}
 
                             {(task.created_by || task.createdBy) && (
                               <span className="task-author">
+                                {getEmployeeAvatar(task.created_by || task.createdBy) && (
+                                  <img
+                                    src={getEmployeeAvatar(task.created_by || task.createdBy)}
+                                    alt=""
+                                    className="employee-inline-avatar"
+                                  />
+                                )}
                                 Added by {task.created_by || task.createdBy}
                               </span>
                             )}
