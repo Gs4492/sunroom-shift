@@ -1,5 +1,6 @@
 
 import { useState } from 'react'
+import { useAuth } from './useAuth'
 
 const EMPLOYEE_NAMES = ['Carla', 'Anoushka', 'Chloe', 'Medina', 'Parul', 'Nikhil', 'Geet']
 const OTHER_OPTION = '__other__'
@@ -36,9 +37,22 @@ function Icon({ name, size = 20 }) {
         <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L9 17l-4 1 1-4Z" />
       </>
     ),
+    lock: (
+      <>
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      </>
+    ),
+    users: (
+      <>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="10" cy="7" r="4" />
+        <path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+      </>
+    ),
   }
 
-  return <svg {...common}>{icons[name]}</svg>
+  return <svg {...common}>{icons[name] || icons.check}</svg>
 }
 
 function getTodayDate() {
@@ -75,7 +89,9 @@ function isTaskOverdue(task) {
   )
 }
 
-function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
+function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask, onAddPrivateTask }) {
+  const { isAuthorized, profile } = useAuth()
+  const [visibility, setVisibility] = useState('team') // 'team' | 'private'
   const [newTask, setNewTask] = useState('')
   const [assignMode, setAssignMode] = useState('none')
   const [otherAssignee, setOtherAssignee] = useState('')
@@ -99,6 +115,19 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
   const [savingEdit, setSavingEdit] = useState(false)
 
   const handleAddTask = () => {
+    if (visibility === 'private') {
+      if (!newTask.trim()) return
+      onAddPrivateTask?.({
+        title: newTask.trim(),
+        priority,
+        dueDate: dueDate || null,
+      })
+      setNewTask('')
+      setPriority('normal')
+      setDueDate('')
+      return
+    }
+
     if (!newTask.trim() || !createdBy.trim()) {
       return
     }
@@ -258,6 +287,37 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
         </section>
 
         <section className="add-task-section">
+          {isAuthorized && (
+            <div className="task-visibility-toggle-group" role="radiogroup" aria-label="Task Visibility">
+              <button
+                type="button"
+                role="radio"
+                aria-checked={visibility === 'team'}
+                className={`task-visibility-btn ${visibility === 'team' ? 'active' : ''}`}
+                onClick={() => setVisibility('team')}
+              >
+                <Icon name="users" size={15} />
+                <span>Team Task</span>
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={visibility === 'private'}
+                className={`task-visibility-btn ${visibility === 'private' ? 'active' : ''}`}
+                onClick={() => setVisibility('private')}
+              >
+                <Icon name="lock" size={15} />
+                <span>Private Task</span>
+              </button>
+            </div>
+          )}
+
+          {isAuthorized && visibility === 'private' && (
+            <p className="visibility-helper-text">
+              🔒 Personal to <strong>{profile?.name || 'Authorized Member'}</strong>. This task cannot be assigned to others and will not appear in the shared team task list.
+            </p>
+          )}
+
           <input
             type="text"
             value={newTask}
@@ -265,57 +325,61 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
             onKeyDown={(event) => {
               if (event.key === 'Enter') handleAddTask()
             }}
-            placeholder="Add a task..."
+            placeholder={visibility === 'private' ? "Add a private personal task..." : "Add a task..."}
             aria-label="New task"
           />
 
-          <div className="task-assignment">
-            <label htmlFor="taskCreatedBy">Your name</label>
-            <select
-              id="taskCreatedBy"
-              value={createdBySelection}
-              onChange={(event) => setCreatedBySelection(event.target.value)}
-            >
-              <option value="">Select your name</option>
-              {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
-              <option value={OTHER_OPTION}>Other (enter name)</option>
-            </select>
-            {createdBySelection === OTHER_OPTION && (
-              <input
-                type="text"
-                value={manualCreatedBy}
-                onChange={(event) => setManualCreatedBy(event.target.value)}
-                placeholder="Enter your name"
-                aria-label="Your name"
-                maxLength={60}
-              />
-            )}
-          </div>
+          {visibility === 'team' && (
+            <>
+              <div className="task-assignment">
+                <label htmlFor="taskCreatedBy">Your name</label>
+                <select
+                  id="taskCreatedBy"
+                  value={createdBySelection}
+                  onChange={(event) => setCreatedBySelection(event.target.value)}
+                >
+                  <option value="">Select your name</option>
+                  {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
+                  <option value={OTHER_OPTION}>Other (enter name)</option>
+                </select>
+                {createdBySelection === OTHER_OPTION && (
+                  <input
+                    type="text"
+                    value={manualCreatedBy}
+                    onChange={(event) => setManualCreatedBy(event.target.value)}
+                    placeholder="Enter your name"
+                    aria-label="Your name"
+                    maxLength={60}
+                  />
+                )}
+              </div>
 
-          <div className="task-assignment">
-            <label htmlFor="assignMode">Assign to</label>
+              <div className="task-assignment">
+                <label htmlFor="assignMode">Assign to</label>
 
-            <select
-              id="assignMode"
-              value={assignMode}
-              onChange={(event) => setAssignMode(event.target.value)}
-            >
-              <option value="none">Unassigned</option>
-              {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
-              <option value="other">Other (enter name)</option>
-            </select>
+                <select
+                  id="assignMode"
+                  value={assignMode}
+                  onChange={(event) => setAssignMode(event.target.value)}
+                >
+                  <option value="none">Unassigned</option>
+                  {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
+                  <option value="other">Other (enter name)</option>
+                </select>
 
-            {assignMode === 'other' && (
-              <input
-                type="text"
-                value={otherAssignee}
-                onChange={(event) => setOtherAssignee(event.target.value)}
-                placeholder="Enter assignee's name"
-                aria-label="Assignee's name"
-                maxLength={60}
-              />
-            )}
-          </div>
+                {assignMode === 'other' && (
+                  <input
+                    type="text"
+                    value={otherAssignee}
+                    onChange={(event) => setOtherAssignee(event.target.value)}
+                    placeholder="Enter assignee's name"
+                    aria-label="Assignee's name"
+                    maxLength={60}
+                  />
+                )}
+              </div>
+            </>
+          )}
 
           <div className="task-planning-fields">
             <div className="task-priority-field">
@@ -348,12 +412,14 @@ function Tasks({ tasks, onBack, onAddTask, onToggleTask, onUpdateTask }) {
             className="add-task-submit-button"
             onClick={handleAddTask}
             disabled={
-              !newTask.trim() ||
-              !createdBy.trim() ||
-              (assignMode === 'other' && !otherAssignee.trim())
+              visibility === 'private'
+                ? !newTask.trim()
+                : !newTask.trim() ||
+                  !createdBy.trim() ||
+                  (assignMode === 'other' && !otherAssignee.trim())
             }
           >
-            Add
+            {visibility === 'private' ? 'Add Private Task' : 'Add'}
           </button>
         </section>
 

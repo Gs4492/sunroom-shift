@@ -15,6 +15,15 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
+interface HandoffPhotoItem {
+  id: number
+  handoff_id: number
+  storage_path: string
+  content_type: string
+  created_at: string
+  signedUrl: string | null
+}
+
 serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -124,13 +133,13 @@ serve(async (req: Request) => {
       const urlMap: Record<string, string> = {}
       if (signedUrls) {
         for (const item of signedUrls) {
-          if (item.signedUrl) {
+          if (item.path && item.signedUrl) {
             urlMap[item.path] = item.signedUrl
           }
         }
       }
 
-      const photosByHandoff: Record<string, any[]> = {}
+      const photosByHandoff: Record<string, HandoffPhotoItem[]> = {}
       for (const row of photoRows) {
         const hId = String(row.handoff_id)
         if (!photosByHandoff[hId]) {
@@ -295,9 +304,11 @@ serve(async (req: Request) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     )
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorMsg =
+      err instanceof Error ? err.message : 'An unexpected error occurred'
     return new Response(
-      JSON.stringify({ error: err.message || 'An unexpected error occurred' }),
+      JSON.stringify({ error: errorMsg }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

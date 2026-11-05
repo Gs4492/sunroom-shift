@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import useSpeechRecognition from './useSpeechRecognition'
 import detectCategory from './categoryDetector'
+import { useAuth } from './useAuth'
 import {
   processAndCompressPhoto,
   validatePhotoFiles,
@@ -47,9 +48,22 @@ function Icon({ name, size = 22, strokeWidth = 1.8 }) {
     spinner: (
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     ),
+    lock: (
+      <>
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      </>
+    ),
+    users: (
+      <>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="10" cy="7" r="4" />
+        <path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+      </>
+    ),
   }
 
-  return <svg {...common}>{paths[name]}</svg>
+  return <svg {...common}>{paths[name] || paths.microphone}</svg>
 }
 
 const EMPLOYEE_NAMES = ['Carla', 'Anoushka', 'Chloe', 'Medina', 'Parul', 'Nikhil', 'Geet']
@@ -62,8 +76,12 @@ function getEmployeeSelection(value) {
 function Handoff({
   onBack,
   onSave,
+  onSavePrivateNote,
   editingHandoff = null,
 }) {
+  const { isAuthorized, profile } = useAuth()
+  const [visibility, setVisibility] = useState('team') // 'team' | 'private'
+
   const [category, setCategory] = useState(
     editingHandoff?.category || 'General'
   )
@@ -151,10 +169,12 @@ function Handoff({
       createdBy.trim() !== originalCreatedBy.trim() ||
       selectedPhotos.length > 0 ||
       removedPhotos.length > 0
-    : note.trim().length > 0 ||
-      recipient.trim().length > 0 ||
-      createdBy.trim().length > 0 ||
-      selectedPhotos.length > 0
+    : visibility === 'private'
+      ? note.trim().length > 0
+      : note.trim().length > 0 ||
+        recipient.trim().length > 0 ||
+        createdBy.trim().length > 0 ||
+        selectedPhotos.length > 0
 
   // Clean up object URLs on component unmount
   useEffect(() => {
@@ -291,6 +311,32 @@ function Handoff({
   }
 
   const handleSave = async () => {
+    if (visibility === 'private') {
+      if (!note.trim() || isSaving) return
+      if (isListening) stopListening()
+
+      setIsSaving(true)
+      setSaveError('')
+      setPhotoError('')
+
+      try {
+        const result = await onSavePrivateNote?.({
+          note: note.trim(),
+          category,
+        })
+        if (result === false) {
+          setIsSaving(false)
+        }
+      } catch (err) {
+        console.error('Save private note failed:', err)
+        setSaveError(
+          err.message || 'Could not save private note. Please try again.'
+        )
+        setIsSaving(false)
+      }
+      return
+    }
+
     if (!note.trim() || !createdBy.trim()) return
     if (isSaving || isCompressing) return
 
@@ -394,6 +440,41 @@ function Handoff({
           )}
         </section>
 
+        {!editingHandoff && isAuthorized && (
+          <section className="visibility-selector-section" aria-label="Note Visibility">
+            <span className="visibility-label">Visibility</span>
+            <div className="visibility-toggle-group" role="radiogroup">
+              <button
+                type="button"
+                role="radio"
+                aria-checked={visibility === 'team'}
+                className={`visibility-toggle-btn ${visibility === 'team' ? 'active' : ''}`}
+                onClick={() => setVisibility('team')}
+                disabled={isSaving}
+              >
+                <Icon name="users" size={16} />
+                <span>Team Handoff</span>
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={visibility === 'private'}
+                className={`visibility-toggle-btn ${visibility === 'private' ? 'active' : ''}`}
+                onClick={() => setVisibility('private')}
+                disabled={isSaving}
+              >
+                <Icon name="lock" size={16} />
+                <span>Private Note</span>
+              </button>
+            </div>
+            {visibility === 'private' && (
+              <p className="visibility-helper-text">
+                🔒 Personal to <strong>{profile?.name || 'Authorized Member'}</strong>. This note is strictly private and will never appear in team handoff history or on the shared dashboard.
+              </p>
+            )}
+          </section>
+        )}
+
         <section className="note-section">
           <label htmlFor="handoff-note">
             Your note
@@ -416,182 +497,188 @@ function Handoff({
           />
         </section>
 
-        <section className="recipient-section">
-          <label htmlFor="handoff-recipient">For (optional)</label>
-          <select
-            id="handoff-recipient"
-            value={recipientSelection}
-            disabled={isSaving}
-            onChange={(event) => setRecipientSelection(event.target.value)}
-          >
-            <option value="">Select an employee</option>
-            {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
-            <option value={OTHER_OPTION}>Other (enter name)</option>
-          </select>
-          {recipientSelection === OTHER_OPTION && (
-            <input
-              id="handoff-recipient-other"
-              type="text"
-              value={manualRecipient}
+        {visibility === 'team' && (
+          <section className="recipient-section">
+            <label htmlFor="handoff-recipient">For (optional)</label>
+            <select
+              id="handoff-recipient"
+              value={recipientSelection}
               disabled={isSaving}
-              onChange={(event) => setManualRecipient(event.target.value)}
-              placeholder="Enter recipient name"
-              autoComplete="off"
-              maxLength={60}
-            />
-          )}
-        </section>
-
-        <section className="created-by-section">
-          <label htmlFor="handoff-created-by">Your name</label>
-          <select
-            id="handoff-created-by"
-            value={createdBySelection}
-            disabled={isSaving}
-            onChange={(event) => setCreatedBySelection(event.target.value)}
-            required
-          >
-            <option value="">Select your name</option>
-            {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
-            <option value={OTHER_OPTION}>Other (enter name)</option>
-          </select>
-          {createdBySelection === OTHER_OPTION && (
-            <input
-              id="handoff-created-by-other"
-              type="text"
-              value={manualCreatedBy}
-              disabled={isSaving}
-              onChange={(event) => setManualCreatedBy(event.target.value)}
-              placeholder="Enter your name"
-              autoComplete="name"
-              maxLength={60}
-              required
-            />
-          )}
-        </section>
-
-        <section className="handoff-photos-section">
-          <div className="photos-header">
-            <label htmlFor="handoff-photos">
-              Photos (optional, up to 2)
-            </label>
-            <span className="photos-count-badge" aria-live="polite">
-              {totalPhotoCount} / {MAX_PHOTOS_PER_HANDOFF}
-            </span>
-          </div>
-
-          <input
-            ref={fileInputRef}
-            id="handoff-photos"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,.heic,.heif,image/heic,image/heif"
-            multiple
-            onChange={handlePhotoSelection}
-            disabled={maxReached || isCompressing || isSaving}
-            style={{ display: 'none' }}
-          />
-
-          <div className="photo-picker-row">
-            <button
-              type="button"
-              className="photo-picker-button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={maxReached || isCompressing || isSaving}
+              onChange={(event) => setRecipientSelection(event.target.value)}
             >
-              <Icon name="camera" size={18} />
-              <span>
-                {maxReached
-                  ? 'Photo limit reached'
-                  : totalPhotoCount === 1
-                    ? 'Add 1 more photo'
-                    : 'Choose photos'}
-              </span>
-            </button>
+              <option value="">Select an employee</option>
+              {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
+              <option value={OTHER_OPTION}>Other (enter name)</option>
+            </select>
+            {recipientSelection === OTHER_OPTION && (
+              <input
+                id="handoff-recipient-other"
+                type="text"
+                value={manualRecipient}
+                disabled={isSaving}
+                onChange={(event) => setManualRecipient(event.target.value)}
+                placeholder="Enter recipient name"
+                autoComplete="off"
+                maxLength={60}
+              />
+            )}
+          </section>
+        )}
 
-            <span className="photo-help-text">
-              JPEG, PNG, WebP, or iPhone HEIC. Auto-converted & compressed under 1 MB.
-            </span>
-          </div>
+        {visibility === 'team' && (
+          <section className="created-by-section">
+            <label htmlFor="handoff-created-by">Your name</label>
+            <select
+              id="handoff-created-by"
+              value={createdBySelection}
+              disabled={isSaving}
+              onChange={(event) => setCreatedBySelection(event.target.value)}
+              required
+            >
+              <option value="">Select your name</option>
+              {EMPLOYEE_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}
+              <option value={OTHER_OPTION}>Other (enter name)</option>
+            </select>
+            {createdBySelection === OTHER_OPTION && (
+              <input
+                id="handoff-created-by-other"
+                type="text"
+                value={manualCreatedBy}
+                disabled={isSaving}
+                onChange={(event) => setManualCreatedBy(event.target.value)}
+                placeholder="Enter your name"
+                autoComplete="name"
+                maxLength={60}
+                required
+              />
+            )}
+          </section>
+        )}
 
-          {isCompressing && (
-            <div className="photo-loading-notice" role="status" aria-live="polite">
-              <span className="spin-icon" aria-hidden="true">
-                <Icon name="spinner" size={16} />
-              </span>
-              <span>
-                {isConvertingHeic
-                  ? 'Converting iPhone HEIC photo to JPEG and compressing...'
-                  : 'Compressing and preparing photos...'}
+        {visibility === 'team' && (
+          <section className="handoff-photos-section">
+            <div className="photos-header">
+              <label htmlFor="handoff-photos">
+                Photos (optional, up to 2)
+              </label>
+              <span className="photos-count-badge" aria-live="polite">
+                {totalPhotoCount} / {MAX_PHOTOS_PER_HANDOFF}
               </span>
             </div>
-          )}
 
-          {photoError && (
-            <p className="photo-error" role="alert">
-              {photoError}
-            </p>
-          )}
+            <input
+              ref={fileInputRef}
+              id="handoff-photos"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,.heic,.heif,image/heic,image/heif"
+              multiple
+              onChange={handlePhotoSelection}
+              disabled={maxReached || isCompressing || isSaving}
+              style={{ display: 'none' }}
+            />
 
-          {saveError && (
-            <p className="photo-error" role="alert">
-              {saveError}
-            </p>
-          )}
+            <div className="photo-picker-row">
+              <button
+                type="button"
+                className="photo-picker-button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={maxReached || isCompressing || isSaving}
+              >
+                <Icon name="camera" size={18} />
+                <span>
+                  {maxReached
+                    ? 'Photo limit reached'
+                    : totalPhotoCount === 1
+                      ? 'Add 1 more photo'
+                      : 'Choose photos'}
+                </span>
+              </button>
 
-          {totalPhotoCount > 0 && (
-            <div className="handoff-photo-preview">
-              {/* Existing photos from this handoff */}
-              {existingPhotos.map((photo) => (
-                <div className="handoff-photo-item" key={`existing-${photo.id}`}>
-                  <div className="photo-thumb-container">
-                    <img
-                      src={photo.signedUrl || ''}
-                      alt="Attached handoff photo"
-                      className="photo-thumb-img"
-                    />
-                    <span className="photo-status-badge">Saved</span>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="photo-remove-btn"
-                    onClick={() => handleRemoveExistingPhoto(photo)}
-                    aria-label="Remove this photo"
-                    disabled={isSaving}
-                  >
-                    <Icon name="trash" size={14} />
-                    <span>Remove</span>
-                  </button>
-                </div>
-              ))}
-
-              {/* Newly selected photos */}
-              {selectedPhotos.map((photo, index) => (
-                <div className="handoff-photo-item" key={`new-${photo.name}-${index}`}>
-                  <div className="photo-thumb-container">
-                    <img
-                      src={photo.previewUrl}
-                      alt={`Selected attachment ${index + 1}`}
-                      className="photo-thumb-img"
-                    />
-                    <span className="photo-status-badge new">New</span>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="photo-remove-btn"
-                    onClick={() => handleRemoveNewPhoto(index)}
-                    aria-label={`Remove photo ${index + 1}`}
-                    disabled={isSaving}
-                  >
-                    <Icon name="trash" size={14} />
-                    <span>Remove</span>
-                  </button>
-                </div>
-              ))}
+              <span className="photo-help-text">
+                JPEG, PNG, WebP, or iPhone HEIC. Auto-converted & compressed under 1 MB.
+              </span>
             </div>
-          )}
-        </section>
+
+            {isCompressing && (
+              <div className="photo-loading-notice" role="status" aria-live="polite">
+                <span className="spin-icon" aria-hidden="true">
+                  <Icon name="spinner" size={16} />
+                </span>
+                <span>
+                  {isConvertingHeic
+                    ? 'Converting iPhone HEIC photo to JPEG and compressing...'
+                    : 'Compressing and preparing photos...'}
+                </span>
+              </div>
+            )}
+
+            {photoError && (
+              <p className="photo-error" role="alert">
+                {photoError}
+              </p>
+            )}
+
+            {saveError && (
+              <p className="photo-error" role="alert">
+                {saveError}
+              </p>
+            )}
+
+            {totalPhotoCount > 0 && (
+              <div className="handoff-photo-preview">
+                {/* Existing photos from this handoff */}
+                {existingPhotos.map((photo) => (
+                  <div className="handoff-photo-item" key={`existing-${photo.id}`}>
+                    <div className="photo-thumb-container">
+                      <img
+                        src={photo.signedUrl || ''}
+                        alt="Attached handoff photo"
+                        className="photo-thumb-img"
+                      />
+                      <span className="photo-status-badge">Saved</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="photo-remove-btn"
+                      onClick={() => handleRemoveExistingPhoto(photo)}
+                      aria-label="Remove this photo"
+                      disabled={isSaving}
+                    >
+                      <Icon name="trash" size={14} />
+                      <span>Remove</span>
+                    </button>
+                  </div>
+                ))}
+
+                {/* Newly selected photos */}
+                {selectedPhotos.map((photo, index) => (
+                  <div className="handoff-photo-item" key={`new-${photo.name}-${index}`}>
+                    <div className="photo-thumb-container">
+                      <img
+                        src={photo.previewUrl}
+                        alt={`Selected attachment ${index + 1}`}
+                        className="photo-thumb-img"
+                      />
+                      <span className="photo-status-badge new">New</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="photo-remove-btn"
+                      onClick={() => handleRemoveNewPhoto(index)}
+                      aria-label={`Remove photo ${index + 1}`}
+                      disabled={isSaving}
+                    >
+                      <Icon name="trash" size={14} />
+                      <span>Remove</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         <section className="category-section">
           <label>Category</label>
@@ -622,15 +709,21 @@ function Handoff({
           type="button"
           className="save-handoff"
           onClick={handleSave}
-          disabled={!note.trim() || !createdBy.trim() || isCompressing || isSaving}
+          disabled={
+            visibility === 'private'
+              ? !note.trim() || isSaving
+              : !note.trim() || !createdBy.trim() || isCompressing || isSaving
+          }
         >
           {isSaving ? (
             <span className="button-saving-content">
               <span className="spin-icon" aria-hidden="true">
                 <Icon name="spinner" size={18} />
               </span>
-              <span>Saving handoff...</span>
+              <span>Saving...</span>
             </span>
+          ) : visibility === 'private' ? (
+            'Save Private Note'
           ) : editingHandoff ? (
             'Save Changes'
           ) : (

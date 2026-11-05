@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import './App.css'
 
 import Handoff from './Handoff'
 import HandoffHistory from './HandoffHistory'
 import Tasks from './Tasks'
+import PrivateNotes from './PrivateNotes'
+import PrivateTasks from './PrivateTasks'
+import AuthModal from './AuthModal'
+import { useAuth } from './useAuth'
 import { supabase } from './supabaseClient'
 import sunroomLogo from './assets/sunroom-plants-logo.png'
 import { enablePushNotifications } from './pushNotifications'
@@ -112,22 +116,132 @@ function Icon({ name, size = 20, strokeWidth = 1.8 }) {
       <path d="m12 3 1.9 4.8 4.8 1.9-4.8 1.9L12 16.5l-1.9-4.8L5.3 9.7l4.8-1.9L12 3Z" />
       </>
     ),
+    lock: (
+      <>
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      </>
+    ),
   }
 
   return <svg {...common}>{paths[name] || paths.notes}</svg>
 }
 
 function App() {
+  const { user, profile, isAuthorized, loading, isPasswordRecovery } = useAuth()
   const [screen, setScreen] = useState('home')
   const [historyCategory, setHistoryCategory] = useState('All')
   const [editingHandoff, setEditingHandoff] = useState(null)
   const [successMessage, setSuccessMessage] = useState('')
   const [pushMessage, setPushMessage] = useState('')
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [privateNotesCount, setPrivateNotesCount] = useState(0)
+  const [privateTasksCount, setPrivateTasksCount] = useState(0)
+  const [privateCountsError, setPrivateCountsError] = useState(null)
+
+  const activeUserRef = useRef(user)
+  const isAuthorizedRef = useRef(isAuthorized)
+
+  useEffect(() => {
+    activeUserRef.current = user
+    isAuthorizedRef.current = isAuthorized
+  }, [user, isAuthorized])
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     typeof Notification !== 'undefined' &&
     Notification.permission === 'granted'
   )
+
+  // Ensure unauthorised or logged-out users cannot remain on private screens
+  useEffect(() => {
+    if (!loading && !isAuthorized && (screen === 'private-notes' || screen === 'private-tasks')) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setScreen('home')
+    }
+  }, [isAuthorized, loading, screen])
+
+  // Fetch private notes and tasks counts when authenticated as an authorised user
+  useEffect(() => {
+    let active = true
+
+    const loadPrivateCounts = async () => {
+      if (!isAuthorized || !user) {
+        if (active) {
+          setPrivateNotesCount(0)
+          setPrivateTasksCount(0)
+          setPrivateCountsError(null)
+        }
+        return
+      }
+
+      try {
+        if (active) setPrivateCountsError(null)
+
+        const [notesRes, tasksRes] = await Promise.all([
+          supabase
+            .from('private_notes')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', user.id),
+          supabase
+            .from('private_tasks')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', user.id)
+            .eq('completed', false),
+        ])
+
+        if (!active) return
+
+        let errorFound = null
+
+        if (notesRes.error) {
+          console.error('Error fetching private notes count:', notesRes.error.message)
+          const isMissing =
+            notesRes.error.code === '42P01' ||
+            notesRes.error.code === 'PGRST204' ||
+            notesRes.error.code === 'PGRST205' ||
+            notesRes.error.code === 'PGRST200' ||
+            notesRes.error.message?.toLowerCase().includes('does not exist') ||
+            notesRes.error.message?.toLowerCase().includes('relation')
+          errorFound = isMissing
+            ? 'Database setup required: private tables not found in Supabase.'
+            : `Could not load private notes count: ${notesRes.error.message}`
+        } else {
+          setPrivateNotesCount(notesRes.count || 0)
+        }
+
+        if (tasksRes.error) {
+          console.error('Error fetching private tasks count:', tasksRes.error.message)
+          const isMissing =
+            tasksRes.error.code === '42P01' ||
+            tasksRes.error.code === 'PGRST204' ||
+            tasksRes.error.code === 'PGRST205' ||
+            tasksRes.error.code === 'PGRST200' ||
+            tasksRes.error.message?.toLowerCase().includes('does not exist') ||
+            tasksRes.error.message?.toLowerCase().includes('relation')
+          errorFound =
+            errorFound ||
+            (isMissing
+              ? 'Database setup required: private tables not found in Supabase.'
+              : `Could not load private tasks count: ${tasksRes.error.message}`)
+        } else {
+          setPrivateTasksCount(tasksRes.count || 0)
+        }
+
+        setPrivateCountsError(errorFound)
+      } catch (err) {
+        if (active) {
+          console.error('Exception loading private counts:', err)
+          setPrivateCountsError(err.message || 'Could not load private vault counts.')
+        }
+      }
+    }
+
+    loadPrivateCounts()
+
+    return () => {
+      active = false
+    }
+  }, [isAuthorized, user])
 
   useEffect(() => {
     if (!successMessage) return
@@ -540,6 +654,89 @@ function App() {
     )
   }
 
+  const addPrivateNote = async ({ note, category }) => {
+    if (!user || !isAuthorized) return false
+
+    const activeUserId = user.id
+
+    const { error } = await supabase
+      .from('private_notes')
+      .insert({
+        user_id: activeUserId,
+        note,
+        category: category || 'General',
+      })
+
+    // After request completes, verify that the same user is still authenticated and authorized
+    if (activeUserRef.current?.id !== activeUserId || !isAuthorizedRef.current) {
+      return false
+    }
+
+    if (error) {
+      console.error('Error saving private note:', error.message)
+      const isMissing =
+        error.code === '42P01' ||
+        error.code === 'PGRST204' ||
+        error.code === 'PGRST205' ||
+        error.code === 'PGRST200' ||
+        error.message?.toLowerCase().includes('does not exist') ||
+        error.message?.toLowerCase().includes('relation')
+      showSuccessMessage(
+        isMissing
+          ? 'Database setup required: private_notes table not found.'
+          : `Could not save private note: ${error.message}`
+      )
+      return false
+    }
+
+    setPrivateNotesCount((prev) => prev + 1)
+    showSuccessMessage('Private note saved to your personal vault!')
+    setScreen('home')
+    return true
+  }
+
+  const addPrivateTask = async ({ title, priority, dueDate }) => {
+    if (!user || !isAuthorized) return false
+
+    const activeUserId = user.id
+
+    const { error } = await supabase
+      .from('private_tasks')
+      .insert({
+        user_id: activeUserId,
+        title,
+        priority: priority || 'normal',
+        due_date: dueDate || null,
+        completed: false,
+      })
+
+    // After request completes, verify that the same user is still authenticated and authorized
+    if (activeUserRef.current?.id !== activeUserId || !isAuthorizedRef.current) {
+      return false
+    }
+
+    if (error) {
+      console.error('Error saving private task:', error.message)
+      const isMissing =
+        error.code === '42P01' ||
+        error.code === 'PGRST204' ||
+        error.code === 'PGRST205' ||
+        error.code === 'PGRST200' ||
+        error.message?.toLowerCase().includes('does not exist') ||
+        error.message?.toLowerCase().includes('relation')
+      showSuccessMessage(
+        isMissing
+          ? 'Database setup required: private_tasks table not found.'
+          : `Could not save private task: ${error.message}`
+      )
+      return false
+    }
+
+    setPrivateTasksCount((prev) => prev + 1)
+    showSuccessMessage('Private task saved to your personal vault!')
+    return true
+  }
+
   const openHistory = (category = 'All') => {
     setHistoryCategory(category)
     setScreen('history')
@@ -581,6 +778,30 @@ function App() {
   ) : null
 
   const renderScreen = () => {
+    if (screen === 'private-notes') {
+      if (!isAuthorized) {
+        return null
+      }
+      return (
+        <PrivateNotes
+          onBack={() => setScreen('home')}
+          onShowMessage={showSuccessMessage}
+        />
+      )
+    }
+
+    if (screen === 'private-tasks') {
+      if (!isAuthorized) {
+        return null
+      }
+      return (
+        <PrivateTasks
+          onBack={() => setScreen('home')}
+          onShowMessage={showSuccessMessage}
+        />
+      )
+    }
+
     if (screen === 'handoff') {
       return (
         <Handoff
@@ -591,6 +812,7 @@ function App() {
             setScreen(editingHandoff ? 'history' : 'home')
           }}
           onSave={editingHandoff ? updateHandoff : addHandoff}
+          onSavePrivateNote={addPrivateNote}
         />
       )
     }
@@ -615,12 +837,25 @@ function App() {
           onAddTask={addTask}
           onToggleTask={toggleTask}
           onUpdateTask={updateTask}
+          onAddPrivateTask={addPrivateTask}
         />
       )
     }
 
     return (
       <main className="main-content">
+        <div className="top-utility-bar">
+          <button
+            type="button"
+            className={`header-auth-pill ${isAuthorized ? 'authorized' : user ? 'logged-in' : ''}`}
+            onClick={() => setIsAuthModalOpen(true)}
+            aria-label={isAuthorized ? `Signed in as ${profile?.name}` : 'Private login'}
+          >
+            <Icon name="lock" size={14} />
+            <span>{isAuthorized ? profile?.name : user ? 'Account' : 'Private Access'}</span>
+          </button>
+        </div>
+
         <section className="welcome">
           <img
             src={sunroomLogo}
@@ -647,6 +882,58 @@ function App() {
 
           {pushMessage && <p role="status">{pushMessage}</p>}
         </section>
+
+        {isAuthorized && (
+          <section className="private-dashboard-section" aria-label="Personal Vault">
+            {privateCountsError && (
+              <div className="auth-alert warning" role="alert" style={{ marginBottom: '14px' }}>
+                <Icon name="lock" size={16} />
+                <span>{privateCountsError}</span>
+              </div>
+            )}
+            <div className="private-dashboard-grid">
+              <button
+                type="button"
+                className="private-dash-card"
+                onClick={() => setScreen('private-notes')}
+              >
+                <div className="private-dash-header">
+                  <span className="private-dash-icon">
+                    <Icon name="lock" size={18} />
+                  </span>
+                  <span className="private-dash-badge">CONFIDENTIAL</span>
+                </div>
+                <h3>My Private Notes</h3>
+                <p className="private-dash-count">
+                  <strong>{privateNotesCount}</strong> personal {privateNotesCount === 1 ? 'note' : 'notes'}
+                </p>
+                <span className="private-dash-link">
+                  Open notes <Icon name="arrowRight" size={14} />
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className="private-dash-card"
+                onClick={() => setScreen('private-tasks')}
+              >
+                <div className="private-dash-header">
+                  <span className="private-dash-icon">
+                    <Icon name="checkSquare" size={18} />
+                  </span>
+                  <span className="private-dash-badge">CONFIDENTIAL</span>
+                </div>
+                <h3>My Private Tasks</h3>
+                <p className="private-dash-count">
+                  <strong>{privateTasksCount}</strong> open {privateTasksCount === 1 ? 'task' : 'tasks'}
+                </p>
+                <span className="private-dash-link">
+                  Open tasks <Icon name="arrowRight" size={14} />
+                </span>
+              </button>
+            </div>
+          </section>
+        )}
 
         <section className="handoff-card">
           <div className="card-top">
@@ -885,6 +1172,11 @@ function App() {
       </nav>
 
       {successToast}
+
+      <AuthModal
+        isOpen={isAuthModalOpen || Boolean(isPasswordRecovery)}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </div>
   )
 }
