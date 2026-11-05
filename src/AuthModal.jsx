@@ -431,7 +431,7 @@ export default function AuthModal({ isOpen, onClose }) {
             <form onSubmit={handleLogin} className="auth-form">
               <div className="auth-team-badge">
                 <Icon name="user" size={15} />
-                <span>Private space for <strong>Geet</strong>, <strong>Nikhil</strong>, and <strong>Parul</strong></span>
+                <span>Private space for <strong>Parul</strong>, and <strong>Nikhil</strong></span>
               </div>
 
               <div className="form-group">
