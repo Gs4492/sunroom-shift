@@ -32,6 +32,19 @@
     />
 
     <title>Sunroom Shift</title>
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('sunroom-theme');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (!saved && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
 
   <body>

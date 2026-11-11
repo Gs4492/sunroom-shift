@@ -95,6 +95,88 @@
   --transition-normal: 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ==========================================================================
+   SUNROOM PLANTS - Botanical Night (Dark Mode Palette)
+   ========================================================================== */
+[data-theme="dark"] {
+  color: #e8f1ec;
+  background-color: #0d1712;
+
+  /* Deep Botanical Slate Surfaces */
+  --app-bg: #0d1712;
+  --surface: #142219;
+  --surface-muted: #1a2c20;
+  --surface-card: #142219;
+  --surface-elevated: #1e3326;
+
+  /* Translucent Glass Variants */
+  --glass-surface: rgba(20, 34, 25, 0.9);
+  --glass-surface-hover: rgba(26, 44, 32, 0.96);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-subtle: rgba(255, 255, 255, 0.06);
+
+  /* Typography / Inks */
+  --ink: #e8f1ec;
+  --ink-soft: #c0d2c6;
+  --muted: #829a8a;
+  --muted-light: #52675a;
+
+  /* Borders & Dividers */
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --line-soft: rgba(255, 255, 255, 0.04);
+  --card-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* Primary Accent: Luminous Warm Terracotta */
+  --accent: #f06a25;
+  --accent-hover: #ff7d38;
+  --accent-active: #de5d14;
+  --accent-soft: rgba(240, 106, 37, 0.18);
+  --accent-soft-hover: rgba(240, 106, 37, 0.28);
+  --accent-glow: rgba(240, 106, 37, 0.35);
+  --focus-ring: 0 0 0 3px rgba(240, 106, 37, 0.35);
+
+  /* Botanical Accents */
+  --forest: #34d399;
+  --forest-soft: rgba(52, 211, 153, 0.15);
+  --success: #34d399;
+  --success-hover: #10b981;
+  --success-soft: rgba(52, 211, 153, 0.15);
+  --success-border: rgba(52, 211, 153, 0.35);
+
+  /* Semantic Tones */
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.15);
+  --danger-border: rgba(248, 113, 113, 0.35);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.15);
+  --warning-border: rgba(251, 191, 36, 0.35);
+  --info: #2dd4bf;
+  --info-soft: rgba(45, 212, 191, 0.15);
+
+  /* Category Signatures in Dark Mode */
+  --cat-plant-care-bg: rgba(52, 211, 153, 0.16);
+  --cat-plant-care-color: #6ee7b7;
+  --cat-customer-bg: rgba(251, 191, 36, 0.16);
+  --cat-customer-color: #fde68a;
+  --cat-stock-bg: rgba(249, 115, 22, 0.16);
+  --cat-stock-color: #fdba74;
+  --cat-task-bg: rgba(45, 212, 191, 0.16);
+  --cat-task-color: #99f6e4;
+  --cat-workshop-bg: rgba(168, 85, 247, 0.16);
+  --cat-workshop-color: #d8b4fe;
+  --cat-general-bg: rgba(148, 163, 184, 0.16);
+  --cat-general-color: #cbd5e1;
+
+  /* Layered Natural Shadows */
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 2px 8px -1px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 24px -4px rgba(0, 0, 0, 0.55), 0 3px 8px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 18px 38px -6px rgba(0, 0, 0, 0.65), 0 6px 14px -3px rgba(0, 0, 0, 0.45);
+  --shadow-floating: 0 14px 34px -4px rgba(0, 0, 0, 0.65), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-cta: 0 10px 28px -4px rgba(240, 106, 37, 0.4);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -119,6 +201,16 @@ body {
     radial-gradient(55% 45% at 90% 10%, rgba(35, 120, 70, 0.07) 0%, transparent 100%),
     radial-gradient(90% 60% at 50% 0%, rgba(220, 238, 226, 0.45) 0%, rgba(248, 247, 242, 0.85) 60%, var(--app-bg) 100%);
   background-attachment: fixed;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+[data-theme="dark"] body {
+  background: var(--app-bg);
+  color: var(--ink);
+  background-image:
+    radial-gradient(40% 35% at 5% 5%, rgba(240, 106, 37, 0.08) 0%, transparent 100%),
+    radial-gradient(55% 45% at 90% 10%, rgba(52, 211, 153, 0.09) 0%, transparent 100%),
+    radial-gradient(90% 60% at 50% 0%, rgba(20, 34, 25, 0.5) 0%, var(--app-bg) 100%);
 }
 
 button,
@@ -166,4 +258,12 @@ textarea:disabled {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(20, 36, 26, 0.28);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
 }

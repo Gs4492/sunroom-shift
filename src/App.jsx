@@ -39,6 +39,9 @@ function Icon({ name, size = 20, strokeWidth = 1.8 }) {
         <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
       </>
     ),
+    moon: (
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+    ),
     menu: (
       <path
         d="M12 5h.01M12 12h.01M12 19h.01"
@@ -138,6 +141,34 @@ function App() {
   const [privateNotesCount, setPrivateNotesCount] = useState(0)
   const [privateTasksCount, setPrivateTasksCount] = useState(0)
   const [privateCountsError, setPrivateCountsError] = useState(null)
+
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sunroom-theme')
+      if (saved === 'dark' || saved === 'light') return saved
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark'
+      }
+    }
+    return 'light'
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    try {
+      localStorage.setItem('sunroom-theme', theme)
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', theme === 'dark' ? '#0d1712' : '#f8f7f2')
+      }
+    } catch {
+      // Ignore storage errors in restricted contexts
+    }
+  }, [theme])
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))
+  }
 
   const activeUserRef = useRef(user)
   const isAuthorizedRef = useRef(isAuthorized)
@@ -845,6 +876,16 @@ function App() {
     return (
       <main className="main-content">
         <div className="top-utility-bar">
+          <button
+            type="button"
+            className="theme-toggle-pill"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={14} />
+            <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+          </button>
           <button
             type="button"
             className={`header-auth-pill ${isAuthorized ? 'authorized' : user ? 'logged-in' : ''}`}

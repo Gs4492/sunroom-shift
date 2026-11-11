@@ -76,13 +76,28 @@ function formatDueDate(dateString) {
   })
 }
 
+function getTodayDate() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+function isTaskOverdue(task) {
+  if (!task || task.completed || !task.due_date) return false
+  const cleanDueDate = String(task.due_date).split('T')[0]
+  return cleanDueDate < getTodayDate()
+}
+
 export default function PrivateTasks({ onBack, onShowMessage }) {
   const { user, profile, isAuthorized } = useAuth()
   const [tasks, setTasks] = useState([])
   const [loadedUserId, setLoadedUserId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [dbError, setDbError] = useState(null)
-  const [filterMode, setFilterMode] = useState('open') // 'open' | 'completed' | 'all'
+  const [filterMode, setFilterMode] = useState('open') // 'open' | 'overdue' | 'completed' | 'all'
   const [searchQuery, setSearchQuery] = useState('')
 
   // New task form state
@@ -353,6 +368,7 @@ export default function PrivateTasks({ onBack, onShowMessage }) {
 
   const filteredTasks = safeTasks.filter((task) => {
     if (filterMode === 'open' && task.completed) return false
+    if (filterMode === 'overdue' && !isTaskOverdue(task)) return false
     if (filterMode === 'completed' && !task.completed) return false
 
     if (searchQuery.trim()) {
@@ -368,6 +384,7 @@ export default function PrivateTasks({ onBack, onShowMessage }) {
 
   const openCount = safeTasks.filter((t) => !t.completed).length
   const completedCount = safeTasks.filter((t) => t.completed).length
+  const overdueCount = safeTasks.filter(isTaskOverdue).length
 
   return (
     <div className="tasks-screen">
@@ -399,6 +416,15 @@ export default function PrivateTasks({ onBack, onShowMessage }) {
           </div>
         )}
 
+        {overdueCount > 0 && (
+          <p className="task-overdue-summary" role="status" style={{ marginBottom: 12 }}>
+            <Icon name="alert" size={16} />
+            <span>
+              {overdueCount} overdue personal {overdueCount === 1 ? 'task needs' : 'tasks need'} attention.
+            </span>
+          </p>
+        )}
+
         {/* Filter Tabs & Search */}
         <div className="private-filters-section">
           <div className="task-filter-tabs" role="tablist" aria-label="Task filters">
@@ -410,6 +436,17 @@ export default function PrivateTasks({ onBack, onShowMessage }) {
               onClick={() => setFilterMode('open')}
             >
               Open ({openCount})
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={filterMode === 'overdue'}
+              className={`task-tab-btn overdue-tab ${overdueCount > 0 ? 'has-overdue' : ''} ${
+                filterMode === 'overdue' ? 'active' : ''
+              }`}
+              onClick={() => setFilterMode('overdue')}
+            >
+              Overdue ({overdueCount})
             </button>
             <button
               type="button"
@@ -529,120 +566,125 @@ export default function PrivateTasks({ onBack, onShowMessage }) {
               <Icon name="lock" size={32} />
               <p>
                 {searchQuery || filterMode !== 'open'
-                  ? 'No private tasks match your filter.'
+                  ? filterMode === 'overdue'
+                    ? 'No overdue personal tasks. You are all caught up!'
+                    : 'No private tasks match your filter.'
                   : 'No personal tasks on your list. Private tasks cannot be assigned to other employees.'}
               </p>
             </div>
           ) : (
-            filteredTasks.map((taskItem) => (
-              <div
-                key={taskItem.id}
-                className={`private-task-item ${taskItem.completed ? 'completed' : ''} ${
-                  editingId === taskItem.id ? 'editing' : ''
-                }`}
-              >
-                {editingId === taskItem.id ? (
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                      handleSaveEdit(taskItem.id)
-                    }}
-                    className="private-edit-form"
-                    style={{ width: '100%' }}
-                  >
-                    <input
-                      type="text"
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                      required
-                    />
-                    <div className="task-planning-fields" style={{ marginTop: 8 }}>
-                      <div className="task-priority-field">
-                        <label>Priority</label>
-                        <select
-                          value={editPriority}
-                          onChange={(e) => setEditPriority(e.target.value)}
-                        >
-                          <option value="low">Low Priority</option>
-                          <option value="normal">Normal Priority</option>
-                          <option value="high">High Priority</option>
-                          <option value="urgent">Urgent</option>
-                        </select>
-                      </div>
-                      <div className="task-due-date-field">
-                        <label>Due Date</label>
-                        <input
-                          type="date"
-                          value={editDueDate}
-                          onChange={(e) => setEditDueDate(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="private-form-actions" style={{ marginTop: 10 }}>
-                      <button
-                        type="submit"
-                        className="add-task-submit-button"
-                        disabled={savingEdit || !editTitle.trim()}
-                      >
-                        {savingEdit ? 'Updating...' : 'Save'}
-                      </button>
-                      <button
-                        type="button"
-                        className="auth-btn auth-btn-secondary"
-                        onClick={() => setEditingId(null)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      className={`private-checkbox ${taskItem.completed ? 'checked' : ''}`}
-                      onClick={() => handleToggleTask(taskItem)}
-                      aria-label={taskItem.completed ? 'Mark uncompleted' : 'Mark completed'}
+            filteredTasks.map((taskItem) => {
+              const overdue = isTaskOverdue(taskItem)
+              return (
+                <div
+                  key={taskItem.id}
+                  className={`private-task-item ${taskItem.completed ? 'completed' : ''} ${
+                    overdue ? 'overdue' : ''
+                  } ${editingId === taskItem.id ? 'editing' : ''}`}
+                >
+                  {editingId === taskItem.id ? (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault()
+                        handleSaveEdit(taskItem.id)
+                      }}
+                      className="private-edit-form"
+                      style={{ width: '100%' }}
                     >
-                      {taskItem.completed && <Icon name="check" size={14} />}
-                    </button>
-                    <div className="private-task-content">
-                      <span className="private-task-title">{taskItem.title}</span>
-                      <div className="private-task-meta">
-                        {taskItem.priority && taskItem.priority !== 'normal' && (
-                          <span className={`priority-tag priority-${taskItem.priority}`}>
-                            {taskItem.priority.toUpperCase()}
-                          </span>
-                        )}
-                        {taskItem.due_date && (
-                          <span className="private-task-due">
-                            <Icon name="clock" size={12} />
-                            <span>{formatDueDate(taskItem.due_date)}</span>
-                          </span>
-                        )}
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        required
+                      />
+                      <div className="task-planning-fields" style={{ marginTop: 8 }}>
+                        <div className="task-priority-field">
+                          <label>Priority</label>
+                          <select
+                            value={editPriority}
+                            onChange={(e) => setEditPriority(e.target.value)}
+                          >
+                            <option value="low">Low Priority</option>
+                            <option value="normal">Normal Priority</option>
+                            <option value="high">High Priority</option>
+                            <option value="urgent">Urgent</option>
+                          </select>
+                        </div>
+                        <div className="task-due-date-field">
+                          <label>Due Date</label>
+                          <input
+                            type="date"
+                            value={editDueDate}
+                            onChange={(e) => setEditDueDate(e.target.value)}
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="private-note-actions" style={{ borderTop: 'none', padding: 0 }}>
+                      <div className="private-form-actions" style={{ marginTop: 10 }}>
+                        <button
+                          type="submit"
+                          className="add-task-submit-button"
+                          disabled={savingEdit || !editTitle.trim()}
+                        >
+                          {savingEdit ? 'Updating...' : 'Save'}
+                        </button>
+                        <button
+                          type="button"
+                          className="auth-btn auth-btn-secondary"
+                          onClick={() => setEditingId(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
                       <button
                         type="button"
-                        className="private-action-icon-btn"
-                        onClick={() => handleStartEdit(taskItem)}
-                        aria-label="Edit task"
+                        className={`private-checkbox ${taskItem.completed ? 'checked' : ''}`}
+                        onClick={() => handleToggleTask(taskItem)}
+                        aria-label={taskItem.completed ? 'Mark uncompleted' : 'Mark completed'}
                       >
-                        <Icon name="edit" size={15} />
+                        {taskItem.completed && <Icon name="check" size={14} />}
                       </button>
-                      <button
-                        type="button"
-                        className="private-action-icon-btn danger"
-                        onClick={() => handleDelete(taskItem.id)}
-                        aria-label="Delete task"
-                      >
-                        <Icon name="trash" size={15} />
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))
+                      <div className="private-task-content">
+                        <span className="private-task-title">{taskItem.title}</span>
+                        <div className="private-task-meta">
+                          {taskItem.priority && taskItem.priority !== 'normal' && (
+                            <span className={`priority-tag priority-${taskItem.priority}`}>
+                              {taskItem.priority.toUpperCase()}
+                            </span>
+                          )}
+                          {taskItem.due_date && (
+                            <span className={`private-task-due ${overdue ? 'overdue' : ''}`}>
+                              <Icon name={overdue ? 'alert' : 'clock'} size={12} />
+                              <span>{overdue ? 'Overdue • ' : ''}{formatDueDate(taskItem.due_date)}</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="private-note-actions" style={{ borderTop: 'none', padding: 0 }}>
+                        <button
+                          type="button"
+                          className="private-action-icon-btn"
+                          onClick={() => handleStartEdit(taskItem)}
+                          aria-label="Edit task"
+                        >
+                          <Icon name="edit" size={15} />
+                        </button>
+                        <button
+                          type="button"
+                          className="private-action-icon-btn danger"
+                          onClick={() => handleDelete(taskItem.id)}
+                          aria-label="Delete task"
+                        >
+                          <Icon name="trash" size={15} />
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )
+            })
           )}
         </div>
       </div>

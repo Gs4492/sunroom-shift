@@ -1820,7 +1820,7 @@ textarea {
   padding: 11px 12px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-control);
-  background: #ffffff;
+  background-color: var(--surface);
   color: var(--ink);
   font-size: 13px;
   line-height: 20px;
@@ -1975,7 +1975,13 @@ textarea {
   padding: 10px 32px 10px 12px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-control);
-  background: #ffffff;
+  background-color: var(--surface);
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23384d3f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
   color: var(--ink);
   font-size: 13px;
   font-weight: 600;
@@ -2267,8 +2273,46 @@ textarea {
 .top-utility-bar {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
   margin-bottom: -6px;
   width: 100%;
+}
+
+.theme-toggle-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  cursor: pointer;
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-fast);
+}
+
+.theme-toggle-pill:hover {
+  background: var(--surface-muted);
+  border-color: var(--muted-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle-pill:active {
+  transform: scale(0.96);
+}
+
+.theme-toggle-pill svg {
+  color: var(--accent);
+  transition: transform var(--transition-fast);
+}
+
+.theme-toggle-pill:hover svg {
+  transform: rotate(20deg);
 }
 
 .header-auth-pill {
@@ -2895,13 +2939,20 @@ textarea {
 }
 
 .private-select {
-  padding: 9px 12px;
+  padding: 9px 32px 9px 12px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-control);
-  background: #ffffff;
+  background-color: var(--surface);
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23384d3f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
   font-size: 13.5px;
   color: var(--ink);
   outline: none;
+  cursor: pointer;
 }
 
 .private-select:focus {
@@ -3142,3 +3193,190 @@ textarea {
   border-color: var(--forest);
 }
 
+
+
+/* Private Task Overdue Indicators & Badges */
+.private-task-item.overdue {
+  border-color: rgba(220, 38, 38, 0.4);
+  background: #fffcfb;
+}
+
+.private-task-due.overdue {
+  color: #b91c1c;
+  font-weight: 700;
+  background: #fee2e2;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+}
+
+.task-tab-btn.overdue-tab.has-overdue {
+  color: #b91c1c;
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.task-tab-btn.overdue-tab.active,
+.task-tab-btn.overdue-tab.has-overdue.active {
+  background: #b91c1c;
+  color: #ffffff;
+  border-color: #b91c1c;
+}
+
+/* ==========================================================================
+   SUNROOM PLANTS - Botanical Night Mode Component Overrides
+   ========================================================================== */
+[data-theme="dark"] .screen-header {
+  background: rgba(13, 23, 18, 0.94);
+  border-bottom-color: var(--line);
+}
+
+[data-theme="dark"] .bottom-nav {
+  background: rgba(20, 34, 25, 0.95);
+  border-top-color: var(--line);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .nav-item.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* Card & Surface Overrides for Dark Mode */
+[data-theme="dark"] .welcome,
+[data-theme="dark"] .handoff-card,
+[data-theme="dark"] .task-progress-card,
+[data-theme="dark"] .quick-card,
+[data-theme="dark"] .handoff-intro,
+[data-theme="dark"] .category-section,
+[data-theme="dark"] .note-section,
+[data-theme="dark"] .recipient-section,
+[data-theme="dark"] .created-by-section,
+[data-theme="dark"] .handoff-photos-section,
+[data-theme="dark"] .history-intro,
+[data-theme="dark"] .history-filter,
+[data-theme="dark"] .history-card,
+[data-theme="dark"] .empty-history,
+[data-theme="dark"] .empty-tasks,
+[data-theme="dark"] .discard-dialog,
+[data-theme="dark"] .tasks-intro,
+[data-theme="dark"] .add-task-section,
+[data-theme="dark"] .task-due-date-field input,
+[data-theme="dark"] .task-section-heading span,
+[data-theme="dark"] .task-search-controls .task-search,
+[data-theme="dark"] .task-card-wrapper,
+[data-theme="dark"] .task-checkbox,
+[data-theme="dark"] .task-action-btn,
+[data-theme="dark"] .task-edit-cancel,
+[data-theme="dark"] .completed-tasks-toggle,
+[data-theme="dark"] .auth-btn-secondary,
+[data-theme="dark"] .private-dash-card,
+[data-theme="dark"] .visibility-toggle-btn.active,
+[data-theme="dark"] .task-visibility-btn.active,
+[data-theme="dark"] .private-add-form,
+[data-theme="dark"] .private-note-card,
+[data-theme="dark"] .private-checkbox,
+[data-theme="dark"] .attention-category,
+[data-theme="dark"] .auth-modal {
+  background-color: var(--surface);
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+[data-theme="dark"] .attention-item {
+  background: var(--surface-muted);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .attention-item:hover {
+  background: var(--surface-elevated);
+  border-color: var(--line-strong);
+}
+
+[data-theme="dark"] .welcome-logo {
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45)) brightness(1.1);
+}
+
+/* Select Dropdowns in Dark Mode */
+[data-theme="dark"] select,
+[data-theme="dark"] .task-priority-field select,
+[data-theme="dark"] .task-search-controls .task-priority-filter,
+[data-theme="dark"] .private-select {
+  background-color: var(--surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23b8c9be' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 15px;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+[data-theme="dark"] .task-priority-field select,
+[data-theme="dark"] .task-search-controls .task-priority-filter,
+[data-theme="dark"] .private-select {
+  background-position: right 10px center;
+  background-size: 14px;
+}
+
+[data-theme="dark"] select option,
+[data-theme="dark"] .task-priority-field select option,
+[data-theme="dark"] .task-search-controls .task-priority-filter option,
+[data-theme="dark"] .private-select option {
+  background-color: #142219;
+  color: #e8f1ec;
+}
+
+[data-theme="dark"] .task-due-date-field input::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+}
+
+[data-theme="dark"] .private-identity-banner {
+  background: linear-gradient(135deg, #16261d 0%, #1c3225 100%);
+  border-color: var(--line-strong);
+}
+
+[data-theme="dark"] .private-identity-banner p {
+  color: var(--ink-soft);
+}
+
+[data-theme="dark"] .auth-user-info {
+  background: var(--surface-muted);
+  border-color: var(--line);
+}
+
+/* Overdue Task Badges in Dark Mode */
+[data-theme="dark"] .task-overdue-summary {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .private-task-item.overdue,
+[data-theme="dark"] .task-card-wrapper.overdue {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+[data-theme="dark"] .private-task-due.overdue,
+[data-theme="dark"] .task-due-badge.overdue {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.22);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+[data-theme="dark"] .task-tab-btn.overdue-tab.has-overdue {
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.15);
+}
+
+[data-theme="dark"] .task-tab-btn.overdue-tab.active,
+[data-theme="dark"] .task-tab-btn.overdue-tab.has-overdue.active {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+}
